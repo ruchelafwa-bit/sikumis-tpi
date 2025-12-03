@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buku Tamu — Kantor Imigrasi Kelas I TPI</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css (untuk beberapa animasi ringan) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Chart.js untuk statistik -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- SheetJS untuk export Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    body { font-family: 'Poppins', system-ui, -apple-system, sans-serif; }
+    .modal-backdrop { background: rgba(0,0,0,0.6); }
+    /* Print styles for receipt */
+    @media print {
+      body * { visibility: hidden; }
+      #printReceipt, #printReceipt * { visibility: visible; }
+      #printReceipt { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto flex items-center justify-between p-4">
+      <div class="flex items-center gap-3">
+        <img src="logo_imigrasi-removebg-preview.png" alt="Logo" class="w-12 h-12 object-contain" />
+        <div>
+          <div class="text-lg font-semibold">Kantor Imigrasi Kelas I TPI</div>
+          <div class="text-xs text-slate-500">Buku Tamu Digital</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden md:block text-sm text-slate-600">Jl. Jend. A. Yani No. 31, Tanjungpinang</div>
+        <button id="btnGoHome" class="px-3 py-2 rounded hover:bg-slate-100">Beranda</button>
+        <button id="btnGuest" class="px-3 py-2 rounded hover:bg-slate-100">Isi Buku Tamu</button>
+        <button id="btnAdmin" class="px-3 py-2 rounded bg-amber-400 text-sky-900 font-semibold shadow">Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-6xl mx-auto p-6">
+
+    <!-- HOME -->
+    <section id="home" class="min-h-[60vh] rounded-xl overflow-hidden relative bg-cover bg-center" style="background-image:url('imigrasi.jpg')">
+      <div class="absolute inset-0 bg-gradient-to-br from-sky-900/70 to-slate-900/40"></div>
+      <div class="relative z-10 p-10 flex flex-col md:flex-row items-center gap-8">
+        <div class="flex-1 text-white">
+          <h1 class="text-4xl md:text-5xl font-extrabold mb-2 animate__animated animate__fadeInDown">Selamat Datang</h1>
+          <p class="text-lg mb-4 animate__animated animate__fadeInUp">Di Kantor Imigrasi Kelas I Tanjungpinang — Silakan isi buku tamu apabila berkunjung.</p>
+          <div class="flex gap-3">
+            <button class="px-5 py-3 bg-amber-400 text-sky-900 rounded-full font-bold shadow-lg" onclick="showSection('tamu')">Isi Buku Tamu</button>
+            <button class="px-5 py-3 bg-white text-sky-700 rounded-full shadow" onclick="showSection('adminLogin')">Admin</button>
+          </div>
+        </div>
+        <div class="w-48 h-48 bg-white/20 rounded-xl flex items-center justify-center p-4">
+          <img src="logo_imigrasi-removebg-preview.png" alt="logo" class="w-32 h-32 object-contain" />
+        </div>
+      </div>
+
+      <div class="p-6 bg-white/30 backdrop-blur-sm rounded-xl max-w-3xl mx-auto mt-6 text-white/90">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <div class="text-xs uppercase text-slate-200 font-semibold">Alamat</div>
+            <div class="text-sm">Jl. Jend. A. Yani No. 31, Tanjungpinang 29124</div>
+          </div>
+          <div>
+            <div class="text-xs uppercase text-slate-200 font-semibold">Kontak</div>
+            <div class="text-sm">Telp: 0771-21073 • WA: 08117769393</div>
+          </div>
+          <div>
+            <div class="text-xs uppercase text-slate-200 font-semibold">Jam Kerja</div>
+            <div class="text-sm">Senin–Jumat 08:00–16:00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORM TAMU -->
+    <section id="tamu" class="hidden mt-8">
+      <div class="bg-white rounded-xl shadow p-6">
+         <img src="logo_imigrasi-removebg-preview.png" alt="Logo" class="w-12 h-12 object-contain" />   
+        <h2 class="text-2xl font-semibold mb-4">Form Buku Tamu</h2>
+        <form id="guestForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input id="nik" placeholder="NIK (16 digit)" class="p-3 border rounded" />
+          <input id="nama" placeholder="Nama Lengkap" class="p-3 border rounded" />
+          <input id="alamat" placeholder="Alamat" class="p-3 border rounded" />
+          <input id="telepon" placeholder="Telepon (min 10 digit)" class="p-3 border rounded" />
+          <input id="instansi" placeholder="Instansi" class="p-3 border rounded" />
+          <input id="bertemu" placeholder="Bertemu Dengan" class="p-3 border rounded" />
+          <input id="tujuan" placeholder="Tujuan Kunjungan" class="p-3 border rounded" />
+          <select id="rombongan" class="p-3 border rounded">
+            <option value="">Individu/Rombongan?</option>
+            <option value="Individu">Individu</option>
+            <option value="Rombongan">Rombongan</option>
+          </select>
+
+          <!-- FOTO -->
+          <div class="md:col-span-2">
+            <label class="block mb-2 font-medium">Foto Wajah</label>
+            <div class="flex items-center gap-3">
+              <label for="foto" class="px-4 py-2 bg-amber-400 text-sky-900 rounded cursor-pointer font-semibold">📸 Capture</label>
+              <div class="text-sm text-slate-500" id="fileName">Belum ada file</div>
+            </div>
+            <input id="foto" type="file" accept="image/*" capture="user" class="hidden" />
+            <img id="previewFoto" class="mt-3 w-40 h-40 object-cover rounded hidden border" alt="preview" />
+          </div>
+
+          <div class="md:col-span-2 flex gap-3">
+            <button id="btnSubmit" class="flex-1 px-4 py-3 bg-sky-700 text-white rounded font-semibold">Kirim & Cetak Bukti</button>
+            <button type="button" onclick="resetForm()" class="px-4 py-3 border rounded">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ADMIN LOGIN -->
+    <section id="adminLogin" class="hidden mt-8">
+      <div class="max-w-md mx-auto bg-white rounded-xl shadow p-6">
+        <h2 class="text-2xl font-semibold mb-4">Login Admin</h2>
+        <form id="loginForm" class="space-y-3">
+          <input id="username" placeholder="Username" class="w-full p-3 border rounded" />
+          <div class="relative">
+            <input id="password" type="password" placeholder="Password" class="w-full p-3 border rounded" />
+            <button type="button" onclick="togglePassword()" class="absolute right-2 top-2 text-slate-600">👁️</button>
+          </div>
+          <div class="flex gap-3">
+            <button class="flex-1 px-4 py-2 bg-sky-700 text-white rounded">Login</button>
+            <button type="button" onclick="showSection('home')" class="px-4 py-2 border rounded">Batal</button>
+          </div>
+          <div id="loginError" class="text-red-500 text-sm hidden">Username atau password salah</div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ADMIN DASHBOARD -->
+    <section id="admin" class="hidden mt-8">
+      <div class="bg-white rounded-xl shadow p-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-xl font-semibold">Data Tamu</h3>
+            <div class="text-sm text-slate-500">Kelola dan ekspor data tamu</div>
+          </div>
+
+          <div class="flex gap-2 items-center">
+            <input id="searchInput" placeholder="Cari nama atau tanggal (YYYY-MM-DD)" class="p-2 border rounded" />
+            <select id="filterTujuan" class="p-2 border rounded">
+              <option value="">Semua Tujuan</option>
+            </select>
+            <input type="date" id="fromDate" class="p-2 border rounded" />
+            <input type="date" id="toDate" class="p-2 border rounded" />
+            <button onclick="applyFilter()" class="px-3 py-2 bg-emerald-600 text-white rounded">Filter</button>
+            <button onclick="clearFilter()" class="px-3 py-2 border rounded">Reset</button>
+            <button onclick="exportExcel()" class="px-3 py-2 bg-green-500 text-white rounded">⬇ Export</button>
+            <button onclick="logoutAdmin()" class="px-3 py-2 bg-red-500 text-white rounded">Logout</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table id="tableGuests" class="w-full text-sm">
+            <thead class="bg-sky-600 text-white">
+              <tr>
+                <th class="p-2 text-left">Waktu</th>
+                <th class="p-2 text-left">NIK</th>
+                <th class="p-2 text-left">Nama</th>
+                <th class="p-2 text-left">Alamat</th>
+                <th class="p-2 text-left">Telepon</th>
+                <th class="p-2 text-left">Instansi</th>
+                <th class="p-2 text-left">Bertemu</th>
+                <th class="p-2 text-left">Tujuan</th>
+                <th class="p-2 text-left">Rombongan</th>
+                <th class="p-2 text-left">Foto</th>
+                <th class="p-2 text-left">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="guestList"></tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 flex gap-2">
+          <button onclick="deleteAll()" class="px-3 py-2 bg-red-600 text-white rounded">Hapus Semua</button>
+          <div class="ml-auto text-sm text-slate-500">Total: <span id="totalCount">0</span></div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-3 rounded shadow">
+            <h4 class="font-semibold mb-2">Grafik Kunjungan (7 hari terakhir)</h4>
+            <canvas id="chartVisits" height="120"></canvas>
+          </div>
+          <div class="bg-white p-3 rounded shadow">
+            <h4 class="font-semibold mb-2">Ringkasan</h4>
+            <div id="summary" class="text-sm text-slate-600"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Foto -->
+  <div id="modalFoto" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+    <div class="bg-white p-4 rounded shadow max-w-[90vw] max-h-[90vh] relative">
+      <button onclick="closeModal()" class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded">✖</button>
+      <img id="modalImage" src="" alt="Foto besar" class="max-w-full max-h-[80vh] rounded" />
+    </div>
+  </div>
+
+  <!-- Hidden print receipt element -->
+  <div id="printReceipt" class="hidden p-6">
+    <div class="max-w-md mx-auto border p-4">
+      <h3 class="text-center font-semibold">Bukti Kunjungan — Kantor Imigrasi Kelas I TPI</h3>
+      <div id="receiptContent" class="mt-4 text-sm"></div>
+      <div class="mt-4 text-center">
+        <small>Terima kasih telah berkunjung.</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ---------- BASIC NAV ----------
+  document.getElementById('btnGoHome').onclick = () => showSection('home');
+  document.getElementById('btnGuest').onclick = () => showSection('tamu');
+  document.getElementById('btnAdmin').onclick = () => showSection('adminLogin');
+
+  function showSection(id) {
+    ['home','tamu','adminLogin','admin'].forEach(s => {
+      document.getElementById(s).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+    if (id === 'admin') loadGuests();
+  }
+
+  // ---------- PREVIEW FOTO ----------
+  const fotoInput = document.getElementById('foto');
+  const previewImg = document.getElementById('previewFoto');
+  const fileNameEl = document.getElementById('fileName');
+
+  fotoInput.addEventListener('change', () => {
+    const f = fotoInput.files[0];
+    fileNameEl.textContent = f ? f.name : 'Belum ada file';
+    if (!f) { previewImg.classList.add('hidden'); return; }
+    const r = new FileReader();
+    r.onload = (e) => {
+      previewImg.src = e.target.result;
+      previewImg.classList.remove('hidden');
+    };
+    r.readAsDataURL(f);
+  });
+
+  // ---------- VALIDATION & SAVE (localStorage) ----------
+  function validateGuest({nik, telepon, nama, alamat, rombongan}) {
+    if (!nik || !/^\d{16}$/.test(nik)) { alert('NIK harus 16 digit angka'); return false; }
+    if (!telepon || !/^\d{10,}$/.test(telepon)) { alert('Telepon harus minimal 10 digit angka'); return false; }
+    if (!nama || !alamat) { alert('Nama dan alamat wajib diisi'); return false; }
+    if (!rombongan) { alert('Pilih Individu atau Rombongan'); return false; }
+    return true;
+  }
+
+  document.getElementById('guestForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const nik = document.getElementById('nik').value.trim();
+    const telepon = document.getElementById('telepon').value.trim();
+    const nama = document.getElementById('nama').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
+    const instansi = document.getElementById('instansi').value.trim();
+    const bertemu = document.getElementById('bertemu').value.trim();
+    const tujuan = document.getElementById('tujuan').value.trim();
+    const rombongan = document.getElementById('rombongan').value;
+
+    const file = fotoInput.files[0];
+    if (!validateGuest({nik, telepon, nama, alamat, rombongan})) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const entry = {
+        id: Math.random().toString(36).slice(2,9),
+        waktu: new Date().toISOString(),
+        nik, nama, alamat, telepon, instansi, bertemu, tujuan, rombongan,
+        foto: reader.result
+      };
+      const guests = JSON.parse(localStorage.getItem('guests') || '[]');
+      guests.unshift(entry); // newest first
+      localStorage.setItem('guests', JSON.stringify(guests));
+      // generate receipt & print
+      printReceipt(entry);
+      // reset
+      this.reset();
+      previewImg.classList.add('hidden');
+      fileNameEl.textContent = 'Belum ada file';
+      showSection('home');
+    };
+    if (file) reader.readAsDataURL(file);
+    else {
+      // If no file (shouldn't happen because required), but handle gracefully
+      reader.onloadend();
+    }
+  });
+
+  function resetForm(){
+    document.getElementById('guestForm').reset();
+    previewImg.classList.add('hidden');
+    fileNameEl.textContent = 'Belum ada file';
+  }
+
+  // ---------- RECEIPT PRINT ----------
+  function printReceipt(entry) {
+    const content = `
+      <div><strong>Waktu:</strong> ${new Date(entry.waktu).toLocaleString()}</div>
+      <div><strong>NIK:</strong> ${entry.nik}</div>
+      <div><strong>Nama:</strong> ${entry.nama}</div>
+      <div><strong>Instansi:</strong> ${entry.instansi || '-'}</div>
+      <div><strong>Tujuan:</strong> ${entry.tujuan || '-'}</div>
+      <div><strong>Rombongan:</strong> ${entry.rombongan}</div>
+    `;
+    document.getElementById('receiptContent').innerHTML = content;
+    // Show hidden print element and trigger print
+    document.getElementById('printReceipt').classList.remove('hidden');
+    setTimeout(() => { window.print(); document.getElementById('printReceipt').classList.add('hidden'); }, 300);
+  }
+
+  // ---------- ADMIN: LOGIN ----------
+  document.getElementById('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    if (u === 'admin' && p === 'admin123') {
+      localStorage.setItem('isAdminLoggedIn','true');
+      showSection('admin');
+      loadGuests();
+    } else {
+      document.getElementById('loginError').classList.remove('hidden');
+    }
+  });
+  function togglePassword(){ const f = document.getElementById('password'); f.type = f.type === 'password' ? 'text' : 'password'; }
+  function logoutAdmin(){ localStorage.removeItem('isAdminLoggedIn'); alert('Logout berhasil'); showSection('adminLogin'); }
+
+  // ---------- LOAD & RENDER GUESTS ----------
+  function loadGuests() {
+    const guests = JSON.parse(localStorage.getItem('guests') || '[]');
+    const tbody = document.getElementById('guestList');
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    const from = document.getElementById('fromDate').value;
+    const to = document.getElementById('toDate').value;
+    const tujuanFilter = document.getElementById('filterTujuan').value;
+
+    // filter list
+    const filtered = guests.filter(g => {
+      if (search) {
+        if (!(g.nama.toLowerCase().includes(search) || new Date(g.waktu).toISOString().slice(0,10).includes(search))) return false;
+      }
+      if (from) {
+        if (new Date(g.waktu) < new Date(from + 'T00:00:00')) return false;
+      }
+      if (to) {
+        if (new Date(g.waktu) > new Date(to + 'T23:59:59')) return false;
+      }
+      if (tujuanFilter && tujuanFilter !== '' && g.tujuan !== tujuanFilter) return false;
+      return true;
+    });
+
+    tbody.innerHTML = filtered.map((g, idx) => `
+      <tr class="border-b">
+        <td class="p-2">${new Date(g.waktu).toLocaleString()}</td>
+        <td class="p-2">${g.nik}</td>
+        <td class="p-2">${g.nama}</td>
+        <td class="p-2">${g.alamat}</td>
+        <td class="p-2">${g.telepon}</td>
+        <td class="p-2">${g.instansi || '-'}</td>
+        <td class="p-2">${g.bertemu || '-'}</td>
+        <td class="p-2">${g.tujuan || '-'}</td>
+        <td class="p-2">${g.rombongan}</td>
+        <td class="p-2">${g.foto ? `<img src="${g.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModal('${g.id}')"/>` : '-'}</td>
+        <td class="p-2">
+          <button onclick="deleteGuest('${g.id}')" class="px-2 py-1 text-xs bg-red-500 text-white rounded">Hapus</button>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('totalCount').innerText = guests.length;
+    populateTujuanFilter();
+    renderSummary(guests);
+    renderChart(guests);
+  }
+
+  // open modal by id
+  function openModal(id) {
+    const guests = JSON.parse(localStorage.getItem('guests') || '[]');
+    const g = guests.find(x => x.id === id);
+    if (!g || !g.foto) return;
+    document.getElementById('modalImage').src = g.foto;
+    document.getElementById('modalFoto').classList.remove('hidden');
+  }
+  function closeModal(){ document.getElementById('modalFoto').classList.add('hidden'); }
+
+  // delete one guest
+  function deleteGuest(id) {
+    if (!confirm('Hapus entri ini?')) return;
+    let guests = JSON.parse(localStorage.getItem('guests') || '[]');
+    guests = guests.filter(g => g.id !== id);
+    localStorage.setItem('guests', JSON.stringify(guests));
+    loadGuests();
+  }
+  function deleteAll() {
+    if (!confirm('Hapus SEMUA data tamu?')) return;
+    localStorage.removeItem('guests');
+    loadGuests();
+  }
+
+  // ---------- FILTER HELPERS ----------
+  function applyFilter(){ loadGuests(); }
+  function clearFilter(){
+    document.getElementById('searchInput').value = '';
+    document.getElementById('fromDate').value = '';
+    document.getElementById('toDate').value = '';
+    document.getElementById('filterTujuan').value = '';
+    loadGuests();
+  }
+
+  function populateTujuanFilter(){
+    const guests = JSON.parse(localStorage.getItem('guests') || '[]');
+    const set = new Set(guests.map(g => g.tujuan).filter(Boolean));
+    const sel = document.getElementById('filterTujuan');
+    const current = sel.value;
+    sel.innerHTML = '<option value=\"\">Semua Tujuan</option>' + Array.from(set).map(t => `<option ${t===current?'selected':''} value="${t}">${t}</option>`).join('');
+  }
+
+  // ---------- SUMMARY & CHART ----------
+  let chartInstance = null;
+  function renderSummary(guests) {
+    const total = guests.length;
+    const today = guests.filter(g => new Date(g.waktu).toISOString().slice(0,10) === new Date().toISOString().slice(0,10)).length;
+    const byTujuan = guests.reduce((acc,g) => { acc[g.tujuan] = (acc[g.tujuan]||0)+1; return acc; }, {});
+    document.getElementById('summary').innerHTML = `
+      <div>Total entri: <strong>${total}</strong></div>
+      <div>Entri hari ini: <strong>${today}</strong></div>
+      <div class="mt-2"><strong>Top tujuan:</strong></div>
+      <ul class="list-disc pl-5">${Object.entries(byTujuan).slice(0,5).map(([k,v])=>`<li>${k||'-'} — ${v}</li>`).join('')}</ul>
+    `;
+  }
+
+  function renderChart(guests) {
+    // last 7 days
+    const days = [];
+    for (let i=6;i>=0;i--){
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(d.toISOString().slice(0,10));
+    }
+    const counts = days.map(day => guests.filter(g => new Date(g.waktu).toISOString().slice(0,10) === day).length);
+    const ctx = document.getElementById('chartVisits').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: days, datasets: [{ label: 'Kunjungan', data: counts }] },
+      options: { responsive:true, plugins:{legend:{display:false}} }
+    });
+  }
+
+  // ---------- EXPORT EXCEL ----------
+  function exportExcel(){
+    const guests = JSON.parse(localStorage.getItem('guests') || '[]');
+    if (!guests.length) { alert('Belum ada data!'); return; }
+    const data = guests.map(g => ({
+      Waktu: new Date(g.waktu).toLocaleString(),
+      NIK: g.nik, Nama: g.nama, Alamat: g.alamat,
+      Telepon: g.telepon, Instansi: g.instansi,
+      Bertemu: g.bertemu, Tujuan: g.tujuan, Rombongan: g.rombongan
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    // auto width
+    const cols = Object.keys(data[0]).map(k => ({ wch: Math.max(10, k.length + 10) }));
+    ws['!cols'] = cols;
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'DataTamu');
+    XLSX.writeFile(wb, `Data_Tamu_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  // ---------- SEARCH event ----------
+  document.getElementById('searchInput').addEventListener('input', loadGuests);
+
+  // ---------- Initialize ----------
+  showSection('home');
+  // ensure tujuan filter populated on load
+  populateTujuanFilter();
+
+  </script>
+</body>
+</html>

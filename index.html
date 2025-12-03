@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Tamu - Kantor Imigrasi Kelas I TPI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        /* Slideshow background */
+        .bg-slideshow {
+        background-size: cover;
+        background-position: center;
+        transition: background-image 1s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <!-- HALAMAN HOME -->
+    <section id="home"
+    class="min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-slideshow"
+    style="background-image: url('imigrasi.jpg');">
+        <div class="absolute inset-0 bg-sky-900/70"></div>
+        <button onclick="showPage('adminLogin')"
+            class="absolute top-5 right-5 px-4 py-2 bg-yellow-400 text-sky-900 rounded-full font-bold shadow hover:bg-yellow-500 z-20">🔑
+            Admin</button>
+        <div class="relative bg-white/10 backdrop-blur-md p-10 rounded-2xl shadow-2xl max-w-xl mx-auto z-10">
+            <img src="logouptimi.png" alt="Logo Imigrasi" class="w-36 mx-auto mb-4">
+            <h1 class="text-4xl font-extrabold mb-2 drop-shadow-lg">Selamat Datang</h1>
+            <h2 class="text-2xl font-semibold">Di Situs Kantor Imigrasi Kelas I TPI<br>Tanjungpinang</h2>
+            <div class="mt-8 flex justify-center">
+                <button onclick="showPage('tamu')"
+                    class="px-6 py-3 bg-yellow-400 text-sky-900 rounded-full font-bold shadow-lg hover:bg-yellow-500 transition">Isi
+                    Buku Tamu</button>
+            </div>
+            <div class="mt-10 text-left bg-white/20 backdrop-blur-md p-5 rounded-xl shadow-md text-sm leading-relaxed">
+                <h3 class="text-lg font-bold mb-2">📍 Alamat</h3>
+                <p>Jl. Jend. A. Yani No. 31 Tanjungpinang 29124</p>
+                <h3 class="text-lg font-bold mt-4 mb-2">📞 Kontak</h3>
+                <p><strong>Nomor Whatsapp:</strong> 08117769393</p>
+                <p><strong>Situs Resmi:</strong>
+                    <a href="https://kanimtanjungpinang.kemenkumham.go.id/" target="_blank"
+                        class="underline hover:text-yellow-300">
+                        kanimtanjungpinang.kemenkumham.go.id
+                    </a>
+                </p>
+                <h3 class="text-lg font-bold mt-4 mb-2">⏰ Jam Kerja</h3>
+                <p>Senin s.d Jumat - 08.00 s.d 16.00 WIB</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HALAMAN FORM TAMU -->
+    <section id="tamu"
+        class="hidden min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-slideshow">
+        <div class="absolute inset-0 bg-sky-900/70"></div>
+        <div class="relative bg-white/30 backdrop-blur-md text-black shadow-lg rounded-xl p-8 w-full max-w-2xl z-10">
+           <h2 class="text-4xl font-bold mb-6 text-center text-white drop-shadow-lg">
+                 Form Buku Tamu
+           </h2>
+            <form id="guestForm" class="space-y-4">
+                <input type="text" id="nik" placeholder="NIK/IDCard (16 digit angka)" class="w-full p-3 border rounded">
+                <input type="text" id="nama" placeholder="Nama Lengkap" class="w-full p-3 border rounded" required>
+                <input type="text" id="alamat" placeholder="Alamat" class="w-full p-3 border rounded" required>
+                <input type="text" id="telepon" placeholder="Nomor Telepon (min 10 digit angka)"
+                    class="w-full p-3 border rounded" required>
+                <input type="text" id="instansi" placeholder="Instansi" class="w-full p-3 border rounded">
+                <input type="text" id="bertemu" placeholder="Bertemu Dengan" class="w-full p-3 border rounded">
+                <input type="text" id="tujuan" placeholder="Tujuan Kunjungan" class="w-full p-3 border rounded">
+                <select id="rombongan" class="w-full p-3 border rounded" required>
+                    <option disabled selected value="">Individu/Rombongan?</option>
+                    <option value="Individu">Individu</option>
+                    <option value="Rombongan">Rombongan</option>
+                </select>
+                <select id="petugas" class="w-full p-3 border rounded" required>
+                    <option disabled selected value="">Petugas</option>
+                    <option value="Wahono">Wahono</option>
+                    <option value="Rizky">Rizky</option>
+                    <option value="Fatony">Fatony</option>
+                    <option value="Teguh">Teguh</option>
+                    <option value="Sony">Sony</option>
+                    <option value="Darmawansyah">Darmawansyah</option>
+                    <option value="Putu">Putu</option>
+                    <option value="Ontong">Ontong</option>
+                    <option value="M.Kurniawan">M.Kurniawan</option>
+                    <option value="Suyatni">Suyatni</option>
+                    <option value="Badri">Badri</option>
+                    <option value="Sigit">Sigit</option>
+                    <option value="Andri">Andri</option>
+                    <option value="SriAyuni">Sri Ayuni</option>
+                    <option value="Isti">Isti</option>
+                    <option value="Junaidi">Junaidi</option>
+                    <option value="Idris">Idris</option>
+                    <option value="Dayat">Dayat</option>
+                    <option value="Firdaus">Firdaus</option>
+                </select>
+
+                <!-- WEBCAM FOTO -->
+                <div>
+                    <label class="block mb-2 font-medium text-center">Foto Wajah Tamu</label>
+                    <video id="video" autoplay playsinline
+                        class="mx-auto w-64 h-48 bg-black rounded-lg border-2 border-gray-300"></video>
+                    <button type="button" onclick="takeSnapshot()"
+                        class="mt-3 px-5 py-2 bg-yellow-400 text-sky-900 font-semibold rounded hover:bg-yellow-500 transition flex items-center justify-center mx-auto">📸
+                        Ambil Foto</button>
+                    <canvas id="canvas" class="hidden"></canvas>
+                    <img id="previewFoto"
+                        class="hidden mx-auto mt-3 w-32 h-32 object-cover rounded border-2 border-gray-300"
+                        alt="Preview Foto">
+                </div>
+
+                <button type="submit"
+                    class="w-full py-3 bg-sky-700 text-white rounded-lg font-bold hover:bg-sky-800">Kirim</button>
+            </form>
+            <button onclick="showPage('home')"
+                class="mt-4 w-full py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">⬅ Kembali ke Menu
+                Utama</button>
+        </div>
+    </section>
+
+    <!-- ADMIN LOGIN -->
+    <section id="adminLogin"
+        class="min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-cover bg-center"
+        style="background-image: url('imigrasi.jpg');">
+        <div class="absolute inset-0 bg-white/70"></div>
+        <div class="relative bg-white/30 backdrop-blur-md text-black shadow-lg rounded-xl p-8 w-full max-w-2xl z-10">
+            <img src="logouptimi.png" alt="Logo Imigrasi" class="w-24 mx-auto mb-4">
+            <h2 class="text-2xl font-bold mb-6 text-center text-sky-700">Login Admin</h2>
+            <form id="loginForm" class="space-y-4">
+                <input type="text" id="username" placeholder="Username" class="w-full p-3 border rounded" required>
+                <div class="relative">
+                    <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded"
+                        required>
+                    <span onclick="togglePassword()" class="absolute right-3 top-3 cursor-pointer">👁️</span>
+                </div>
+                <button type="submit"
+                    class="w-full py-3 bg-sky-700 text-white rounded-lg font-bold hover:bg-sky-800">Login</button>
+                <p id="loginError" class="text-red-500 text-sm hidden">Username atau password salah</p>
+            </form>
+            <button onclick="showPage('home')"
+                class="mt-4 w-full py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">⬅ Kembali ke Menu
+                Utama</button>
+        </div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <section id="admin" class="hidden p-6">
+        <div class="flex flex-col gap-4">
+            <h2 class="text-2xl font-bold">Daftar Tamu</h2>
+            <div class="flex flex-col md:flex-row gap-2">
+                <input type="text" id="searchInput" placeholder="Cari nama atau tanggal (YYYY-MM-DD)"
+                    class="p-2 border rounded">
+                <button id="btnExport" onclick="exportToExcel()"
+                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">⬇️ Export Excel</button>
+                <button onclick="logoutAdmin()"
+                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
+            </div>
+
+    <!-- Filter Tanggal -->
+<div class="flex flex-wrap gap-4 mt-4 mb-6">
+  <input type="date" id="startDate" class="p-2 border rounded">
+  <input type="date" id="endDate" class="p-2 border rounded">
+  <button onclick="loadGuests()" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+    Filter
+  </button>
+</div>
+
+            <!-- STATISTIK PENGUNJUNG -->
+<div id="statsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-8">
+    <div class="bg-sky-600 text-white p-4 rounded shadow text-center">
+        <h3 class="text-lg font-bold">Total Pengunjung</h3>
+        <p id="statTotal" class="text-2xl font-extrabold mt-2">0</p>
+    </div>
+    <div class="bg-green-600 text-white p-4 rounded shadow text-center">
+        <h3 class="text-lg font-bold">Individu</h3>
+        <p id="statIndividu" class="text-2xl font-extrabold mt-2">0</p>
+    </div>
+    <div class="bg-yellow-600 text-white p-4 rounded shadow text-center">
+        <h3 class="text-lg font-bold">Rombongan</h3>
+        <p id="statRombongan" class="text-2xl font-extrabold mt-2">0</p>
+    </div>
+</div>
+
+            <div class="overflow-x-auto mt-6">
+                <table class="w-full bg-white shadow rounded text-sm">
+                    <thead class="bg-sky-600 text-white">
+                        <tr>
+                            <th class="p-2">Waktu</th>
+                            <th class="p-2">NIK/IDCard</th>
+                            <th class="p-2">Nama</th>
+                            <th class="p-2">Alamat</th>
+                            <th class="p-2">Telepon</th>
+                            <th class="p-2">Instansi</th>
+                            <th class="p-2">Bertemu</th>
+                            <th class="p-2">Tujuan</th>
+                            <th class="p-2">Rombongan</th>
+                            <th class="p-2">Foto</th>
+                            <th class="p-2">Petugas</th>
+                            <th class="p-2">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guestList"></tbody>
+                </table>
+            </div>
+            <!-- Tombol kembali -->
+<button onclick="showPage('home')"
+class="mt-4 py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+⬅ Kembali ke Menu Utama
+</button>
+
+<!-- PAGINATION CONTROL -->
+<div class="flex justify-center gap-4 mt-6 items-center" id="paginationControls">
+  <button id="prevPage" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">⬅ Prev</button>
+  <span id="pageInfo" class="font-semibold"></span>
+  <button id="nextPage" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Next ➡</button>
+</div>
+
+        </div>
+    </section>
+
+    <!-- MODAL FOTO -->
+    <div id="modalFoto" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white p-4 rounded shadow max-w-[90vw] max-h-[90vh] relative">
+            <button onclick="closeModal()"
+                class="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded">✖</button>
+            <img id="modalImage" src="" alt="Foto besar" class="max-w-full max-h-[80vh] rounded" />
+        </div>
+    </div>
+<!-- MODAL EDIT -->
+<div id="modalEdit" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+    <div class="bg-white p-6 rounded shadow w-full max-w-lg relative">
+        <button onclick="closeEditModal()"
+            class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded">✖</button>
+        <h2 class="text-xl font-bold mb-4">Edit Data Tamu</h2>
+        <form id="editForm" class="space-y-3">
+            <input type="text" id="editNIK" class="w-full p-2 border rounded" placeholder="NIK/IDCard (16 digit)">
+            <input type="text" id="editNama" class="w-full p-2 border rounded" placeholder="Nama">
+            <input type="text" id="editAlamat" class="w-full p-2 border rounded" placeholder="Alamat">
+            <input type="text" id="editTelepon" class="w-full p-2 border rounded" placeholder="Telepon">
+            <input type="text" id="editInstansi" class="w-full p-2 border rounded" placeholder="Instansi">
+            <input type="text" id="editBertemu" class="w-full p-2 border rounded" placeholder="Bertemu Dengan">
+            <input type="text" id="editTujuan" class="w-full p-2 border rounded" placeholder="Tujuan">
+            <select id="editRombongan" class="w-full p-2 border rounded">
+                <option value="Individu">Individu</option>
+                <option value="Rombongan">Rombongan</option>
+            </select>
+            <select id="editPetugas" class="w-full p-2 border rounded">
+                <option value="Wahono">Wahono</option>
+                <option value="Rizky">Rizky</option>
+                <option value="Fatony">Fatony</option>
+                <option value="Teguh">Teguh</option>
+                <option value="Sony">Sony</option>
+                <option value="Darmawansyah">Darmawansyah</option>
+                <option value="Putu">Putu</option>
+                <option value="Ontong">Ontong</option>
+                <option value="M.Kurniawan">M.Kurniawan</option>
+                <option value="Suyatni">Suyatni</option>
+                <option value="Badri">Badri</option>
+                <option value="Sigit">Sigit</option>
+                <option value="Andri">Andri</option>
+                <option value="SriAyuni">Sri Ayuni</option>
+                <option value="Isti">Isti</option>
+                <option value="Junaidi">Junaidi</option>
+                <option value="Idris">Idris</option>
+                <option value="Dayat">Dayat</option>
+                <option value="Firdaus">Firdaus</option>
+            </select>
+            <button type="submit"
+                class="w-full py-2 bg-sky-600 text-white rounded hover:bg-sky-700">💾 Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
+    <script>
+
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxzCpRw79ljO6M0PpDgikWIHD4W4v1TIOPplAj_xDYwLgYmfl7t5X8FRbu5NkYhFyC8/exec"; 
+
+       const pages = ["home", "tamu", "adminLogin", "admin"];
+
+function showPage(page) {
+  pages.forEach(p => document.getElementById(p).classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+
+  if (page === "tamu") {
+    startWebcam();   // ✅ supaya kamera nyala
+  }
+
+  if (page === "admin") {
+    checkAdminAccess(); // ✅ supaya admin tidak bisa dibuka tanpa login
+  }
+}
+
+        // WEBCAM
+        let currentStream, capturedFoto = "";
+        async function startWebcam() {
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById("video");
+                video.srcObject = currentStream;
+                await video.play();
+            } catch (err) { alert("Tidak bisa mengakses kamera: " + err.message); }
+        }
+        function takeSnapshot() {
+            const video = document.getElementById("video"), canvas = document.getElementById("canvas"), preview = document.getElementById("previewFoto"), ctx = canvas.getContext("2d");
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight; ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedFoto = canvas.toDataURL("image/png"); preview.src = capturedFoto; preview.classList.remove("hidden");
+        }
+
+        // FORM SIMPAN
+       document.getElementById("guestForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const nik = document.getElementById("nik").value.trim();
+    const telepon = document.getElementById("telepon").value.trim();
+
+    if (!/^\d{10,}$/.test(telepon)) {
+        alert("Nomor telepon minimal 10 digit angka!");
+        return;
+    }
+
+    if (!capturedFoto) {
+        alert("Silakan ambil foto terlebih dahulu!");
+        return;
+    }
+
+  const data = {
+  waktu: new Date().toISOString(),  // ✅ WAJIB DITAMBAHKAN
+  nik: nik,
+  nama: document.getElementById("nama").value,
+  alamat: document.getElementById("alamat").value,
+  telepon: telepon,
+  instansi: document.getElementById("instansi").value,
+  bertemu: document.getElementById("bertemu").value,
+  tujuan: document.getElementById("tujuan").value,
+  rombongan: document.getElementById("rombongan").value,
+  petugas: document.getElementById("petugas").value,
+  foto: capturedFoto
+};
+
+    try {
+await fetch(SHEET_API_URL, {
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify(data)
+});
+
+// ✅ Karena no-cors tidak bisa baca response, langsung anggap sukses
+const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+guests.push(data);
+localStorage.setItem("guests", JSON.stringify(guests));
+
+alert("✅ Data tamu berhasil disimpan ke Spreadsheet!");
+this.reset();
+document.getElementById("previewFoto").classList.add("hidden");
+capturedFoto = "";
+showPage("home");
+document.getElementById("guestForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const nik = document.getElementById("nik").value.trim();
+  const telepon = document.getElementById("telepon").value.trim();
+
+  if (!/^\d{10,}$/.test(telepon)) {
+    alert("Nomor telepon minimal 10 digit angka!");
+    return;
+  }
+
+  if (!capturedFoto) {
+    alert("Silakan ambil foto terlebih dahulu!");
+    return;
+  }
+
+  const data = {
+    waktu: new Date().toISOString(),
+    nik: nik,
+    nama: document.getElementById("nama").value,
+    alamat: document.getElementById("alamat").value,
+    telepon: telepon,
+    instansi: document.getElementById("instansi").value,
+    bertemu: document.getElementById("bertemu").value,
+    tujuan: document.getElementById("tujuan").value,
+    rombongan: document.getElementById("rombongan").value,
+    petugas: document.getElementById("petugas").value,
+    foto: capturedFoto
+  };
+
+  try {
+    await fetch(SHEET_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data)
+    });
+
+    // ✅ SIMPAN KE LOCAL STORAGE UNTUK ADMIN
+    const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+    guests.push(data);
+    localStorage.setItem("guests", JSON.stringify(guests));
+
+    // ✅ ALERT HANYA SEKALI
+    alert("✅ Data tamu berhasil disimpan ke Spreadsheet!");
+
+    this.reset();
+    document.getElementById("previewFoto").classList.add("hidden");
+    capturedFoto = "";
+    showPage("home");
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Gagal menghubungi server Spreadsheet!");
+  }
+});
+
+    } catch (err) {
+        alert("Gagal menghubungi server Spreadsheet!");
+        console.error(err);
+    }
+});
+
+        // ADMIN
+        function deleteGuest(index) {
+            if (confirm("Yakin ingin menghapus data tamu ini?")) {
+                const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+                guests.splice(index, 1);
+                localStorage.setItem("guests", JSON.stringify(guests));
+                loadGuests();
+            }
+        }
+        function openModal(index) { const guests = JSON.parse(localStorage.getItem("guests") || "[]"), src = guests[index]?.foto || ""; if (!src) return; document.getElementById("modalImage").src = src; document.getElementById("modalFoto").classList.remove("hidden"); }
+        function closeModal() { document.getElementById("modalFoto").classList.add("hidden"); }
+
+        function checkAdminAccess() { if (localStorage.getItem("isAdminLoggedIn") !== "true") showPage("adminLogin"); else loadGuests(); }
+        document.getElementById("loginForm").addEventListener("submit", e => { e.preventDefault(); if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "admin123") { localStorage.setItem("isAdminLoggedIn", "true"); showPage("admin"); loadGuests(); } else document.getElementById("loginError").classList.remove("hidden"); });
+        function logoutAdmin() { localStorage.removeItem("isAdminLoggedIn"); alert("Logout berhasil!"); showPage("adminLogin"); }
+        function togglePassword() { const f = document.getElementById("password"); f.type = f.type === "password" ? "text" : "password"; }
+        function exportToExcel() { const guests = JSON.parse(localStorage.getItem("guests") || "[]"); if (!guests.length) { alert("Belum ada data tamu!"); return; } const data = guests.map(g => ({ Waktu: new Date(g.waktu).toLocaleString(), NIK: g.nik, Nama: g.nama, Alamat: g.alamat, Telepon: g.telepon, Instansi: g.instansi, Bertemu: g.bertemu, Tujuan: g.tujuan, Rombongan: g.rombongan })); const ws = XLSX.utils.json_to_sheet(data), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data Tamu"); XLSX.writeFile(wb, "Data_Tamu.xlsx"); }
+
+        let editIndex = null;
+
+function editGuest(index) {
+  const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+  const g = guests[index];
+  if (!g) return;
+
+  editIndex = index;
+
+  document.getElementById("editNIK").value = g.nik;
+  document.getElementById("editNama").value = g.nama;
+  document.getElementById("editAlamat").value = g.alamat;
+  document.getElementById("editTelepon").value = g.telepon;
+  document.getElementById("editInstansi").value = g.instansi;
+  document.getElementById("editBertemu").value = g.bertemu;
+  document.getElementById("editTujuan").value = g.tujuan;
+  document.getElementById("editRombongan").value = g.rombongan;
+  document.getElementById("editPetugas").value = g.petugas;
+
+  document.getElementById("modalEdit").classList.remove("hidden");
+}
+
+function closeEditModal() {
+    document.getElementById("modalEdit").classList.add("hidden");
+}
+
+document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+
+    if (editIndex !== null && guests[editIndex]) {
+        guests[editIndex].nik = document.getElementById("editNIK").value;
+        guests[editIndex].nama = document.getElementById("editNama").value;
+        guests[editIndex].alamat = document.getElementById("editAlamat").value;
+        guests[editIndex].telepon = document.getElementById("editTelepon").value;
+        guests[editIndex].instansi = document.getElementById("editInstansi").value;
+        guests[editIndex].bertemu = document.getElementById("editBertemu").value;
+        guests[editIndex].tujuan = document.getElementById("editTujuan").value;
+        guests[editIndex].rombongan = document.getElementById("editRombongan").value;
+        guests[editIndex].petugas = document.getElementById("editPetugas").value;
+
+        localStorage.setItem("guests", JSON.stringify(guests));
+        loadGuests();
+        closeEditModal();
+        alert("Data tamu berhasil diperbarui!");
+    }
+});
+
+// === SLIDESHOW HOME ===
+const homeImages = [
+  "imigrasi.jpg",
+  "Ruang Pelayanan.jpg",
+  "MPP1.jpg",
+  "Apel1.jpg",
+];
+let homeIndex = 0;
+const homeSection = document.getElementById("home");
+
+function changeHomeBackground() {
+  homeSection.style.backgroundImage = `url('${homeImages[homeIndex]}')`;
+  homeIndex = (homeIndex + 1) % homeImages.length;
+}
+changeHomeBackground();
+setInterval(changeHomeBackground, 5000);
+
+// === SLIDESHOW FORM TAMU ===
+const tamuImages = [
+  "Apel2.jpg",
+  "Ruang Pelayanan1.jpg",
+  "TPI1.jpg"
+];
+let tamuIndex = 0;
+const tamuSection = document.getElementById("tamu");
+
+function changeTamuBackground() {
+  tamuSection.style.backgroundImage = `url('${tamuImages[tamuIndex]}')`;
+  tamuIndex = (tamuIndex + 1) % tamuImages.length;
+}
+changeTamuBackground();
+setInterval(changeTamuBackground, 5000);
+// === PAGINATION ===
+let currentPage = 1;
+const itemsPerPage = 10;
+
+function loadGuests() {
+    const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const startDate = document.getElementById("startDate")?.value || "";
+    const endDate = document.getElementById("endDate")?.value || "";
+    const list = document.getElementById("guestList");
+
+    // === Filter data ===
+    const filtered = guests.filter(e => {
+        const tanggal = new Date(e.waktu).toISOString().slice(0, 10);
+        const cocokSearch =
+            e.nama.toLowerCase().includes(search) ||
+            tanggal.includes(search);
+        let cocokTanggal = true;
+        if (startDate && tanggal < startDate) cocokTanggal = false;
+        if (endDate && tanggal > endDate) cocokTanggal = false;
+        return cocokSearch && cocokTanggal;
+    });
+
+    // === Pagination logic ===
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedData = filtered.slice(start, end);
+
+    // === Render tabel ===
+    list.innerHTML = paginatedData.map((e, i) => `
+        <tr class="border-b hover:bg-gray-50 h-14">
+            <td class="p-2">${new Date(e.waktu).toLocaleString()}</td>
+            <td class="p-2">${e.nik}</td>
+            <td class="p-2">${e.nama}</td>
+            <td class="p-2">${e.alamat}</td>
+            <td class="p-2">${e.telepon}</td>
+            <td class="p-2">${e.instansi}</td>
+            <td class="p-2">${e.bertemu}</td>
+            <td class="p-2">${e.tujuan}</td>
+            <td class="p-2">${e.rombongan}</td>
+            <td class="p-2">
+                ${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModal('${start + i}')"/>` : '-'}
+            </td>
+            <td class="p-2">${e.petugas}</td>
+            <td class="p-2 flex gap-2">
+                <button onclick="editGuest(${start + i})" class="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500">✏️</button>
+                <button onclick="deleteGuest(${start + i})" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">🗑️</button>
+            </td>
+        </tr>
+    `).join("");
+
+    // === Update kontrol pagination ===
+    document.getElementById("pageInfo").textContent =
+        filtered.length === 0
+            ? "Tidak ada data"
+            : `Halaman ${currentPage} dari ${totalPages}`;
+
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
+
+    updateStats();
+}
+
+// Tombol prev/next
+document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadGuests();
+    }
+});
+
+document.getElementById("nextPage").addEventListener("click", () => {
+    currentPage++;
+    loadGuests();
+});
+
+// Refresh otomatis saat search atau filter berubah
+document.getElementById("searchInput").addEventListener("input", () => {
+    currentPage = 1;
+    loadGuests();
+});
+document.getElementById("startDate").addEventListener("change", () => {
+    currentPage = 1;
+    loadGuests();
+});
+document.getElementById("endDate").addEventListener("change", () => {
+    currentPage = 1;
+    loadGuests();
+});
+
+function updateStats() {
+  const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+
+  const total = guests.length;
+  const individu = guests.filter(g => g.rombongan === "Individu").length;
+  const rombongan = guests.filter(g => g.rombongan === "Rombongan").length;
+
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statIndividu").textContent = individu;
+  document.getElementById("statRombongan").textContent = rombongan;
+}
+
+    </script>
+</body>
+
+</html>
+
