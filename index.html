@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buku Tamu - Kantor Imigrasi Kelas I TPI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .modal-backdrop {
             background: rgba(0, 0, 0, 0.6);
@@ -156,8 +155,6 @@
             <div class="flex flex-col md:flex-row gap-2">
                 <input type="text" id="searchInput" placeholder="Cari nama atau tanggal (YYYY-MM-DD)"
                     class="p-2 border rounded">
-                <button id="btnExport" onclick="exportToExcel()"
-                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">⬇️ Export Excel</button>
                 <button onclick="logoutAdmin()"
                     class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
             </div>
@@ -202,7 +199,6 @@
                             <th class="p-2">Rombongan</th>
                             <th class="p-2">Foto</th>
                             <th class="p-2">Petugas</th>
-                            <th class="p-2">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="guestList"></tbody>
@@ -232,54 +228,9 @@ class="mt-4 py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
             <img id="modalImage" src="" alt="Foto besar" class="max-w-full max-h-[80vh] rounded" />
         </div>
     </div>
-<!-- MODAL EDIT -->
-<div id="modalEdit" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
-    <div class="bg-white p-6 rounded shadow w-full max-w-lg relative">
-        <button onclick="closeEditModal()"
-            class="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded">✖</button>
-        <h2 class="text-xl font-bold mb-4">Edit Data Tamu</h2>
-        <form id="editForm" class="space-y-3">
-            <input type="text" id="editNIK" class="w-full p-2 border rounded" placeholder="NIK/IDCard (16 digit)">
-            <input type="text" id="editNama" class="w-full p-2 border rounded" placeholder="Nama">
-            <input type="text" id="editAlamat" class="w-full p-2 border rounded" placeholder="Alamat">
-            <input type="text" id="editTelepon" class="w-full p-2 border rounded" placeholder="Telepon">
-            <input type="text" id="editInstansi" class="w-full p-2 border rounded" placeholder="Instansi">
-            <input type="text" id="editBertemu" class="w-full p-2 border rounded" placeholder="Bertemu Dengan">
-            <input type="text" id="editTujuan" class="w-full p-2 border rounded" placeholder="Tujuan">
-            <select id="editRombongan" class="w-full p-2 border rounded">
-                <option value="Individu">Individu</option>
-                <option value="Rombongan">Rombongan</option>
-            </select>
-            <select id="editPetugas" class="w-full p-2 border rounded">
-                <option value="Wahono">Wahono</option>
-                <option value="Rizky">Rizky</option>
-                <option value="Fatony">Fatony</option>
-                <option value="Teguh">Teguh</option>
-                <option value="Sony">Sony</option>
-                <option value="Darmawansyah">Darmawansyah</option>
-                <option value="Putu">Putu</option>
-                <option value="Ontong">Ontong</option>
-                <option value="M.Kurniawan">M.Kurniawan</option>
-                <option value="Suyatni">Suyatni</option>
-                <option value="Badri">Badri</option>
-                <option value="Sigit">Sigit</option>
-                <option value="Andri">Andri</option>
-                <option value="SriAyuni">Sri Ayuni</option>
-                <option value="Isti">Isti</option>
-                <option value="Junaidi">Junaidi</option>
-                <option value="Idris">Idris</option>
-                <option value="Dayat">Dayat</option>
-                <option value="Firdaus">Firdaus</option>
-            </select>
-            <button type="submit"
-                class="w-full py-2 bg-sky-600 text-white rounded hover:bg-sky-700">💾 Simpan Perubahan</button>
-        </form>
-    </div>
-</div>
-
     <script>
 
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxzCpRw79ljO6M0PpDgikWIHD4W4v1TIOPplAj_xDYwLgYmfl7t5X8FRbu5NkYhFyC8/exec"; 
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyswvouJg-pJXwgAbm0jn9lwd9dIhYhRgRfnsjDsVBDh5daABhzNYXWjQkYlV7GBYxV/exec"; 
 
        const pages = ["home", "tamu", "adminLogin", "admin"];
 
@@ -299,67 +250,25 @@ function showPage(page) {
         // WEBCAM
         let currentStream, capturedFoto = "";
         async function startWebcam() {
-            try {
-                currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById("video");
-                video.srcObject = currentStream;
-                await video.play();
-            } catch (err) { alert("Tidak bisa mengakses kamera: " + err.message); }
-        }
+  try {
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => track.stop());
+    }
+
+    currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const video = document.getElementById("video");
+    video.srcObject = currentStream;
+    await video.play();
+  } catch (err) {
+    alert("Tidak bisa mengakses kamera: " + err.message);
+  }
+}
         function takeSnapshot() {
             const video = document.getElementById("video"), canvas = document.getElementById("canvas"), preview = document.getElementById("previewFoto"), ctx = canvas.getContext("2d");
             canvas.width = video.videoWidth; canvas.height = video.videoHeight; ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             capturedFoto = canvas.toDataURL("image/png"); preview.src = capturedFoto; preview.classList.remove("hidden");
         }
 
-        // FORM SIMPAN
-       document.getElementById("guestForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const nik = document.getElementById("nik").value.trim();
-    const telepon = document.getElementById("telepon").value.trim();
-
-    if (!/^\d{10,}$/.test(telepon)) {
-        alert("Nomor telepon minimal 10 digit angka!");
-        return;
-    }
-
-    if (!capturedFoto) {
-        alert("Silakan ambil foto terlebih dahulu!");
-        return;
-    }
-
-  const data = {
-  waktu: new Date().toISOString(),  // ✅ WAJIB DITAMBAHKAN
-  nik: nik,
-  nama: document.getElementById("nama").value,
-  alamat: document.getElementById("alamat").value,
-  telepon: telepon,
-  instansi: document.getElementById("instansi").value,
-  bertemu: document.getElementById("bertemu").value,
-  tujuan: document.getElementById("tujuan").value,
-  rombongan: document.getElementById("rombongan").value,
-  petugas: document.getElementById("petugas").value,
-  foto: capturedFoto
-};
-
-    try {
-await fetch(SHEET_API_URL, {
-  method: "POST",
-  mode: "no-cors",
-  body: JSON.stringify(data)
-});
-
-// ✅ Karena no-cors tidak bisa baca response, langsung anggap sukses
-const guests = JSON.parse(localStorage.getItem("guests") || "[]");
-guests.push(data);
-localStorage.setItem("guests", JSON.stringify(guests));
-
-alert("✅ Data tamu berhasil disimpan ke Spreadsheet!");
-this.reset();
-document.getElementById("previewFoto").classList.add("hidden");
-capturedFoto = "";
-showPage("home");
 document.getElementById("guestForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -377,116 +286,50 @@ document.getElementById("guestForm").addEventListener("submit", async function (
   }
 
   const data = {
-    waktu: new Date().toISOString(),
-    nik: nik,
-    nama: document.getElementById("nama").value,
-    alamat: document.getElementById("alamat").value,
-    telepon: telepon,
-    instansi: document.getElementById("instansi").value,
-    bertemu: document.getElementById("bertemu").value,
-    tujuan: document.getElementById("tujuan").value,
-    rombongan: document.getElementById("rombongan").value,
-    petugas: document.getElementById("petugas").value,
-    foto: capturedFoto
-  };
+  waktu: new Date().toISOString(),   // ✅ WAJIB DITAMBAH
+  nik,
+  nama: document.getElementById("nama").value,
+  alamat: document.getElementById("alamat").value,
+  telepon,
+  instansi: document.getElementById("instansi").value,
+  bertemu: document.getElementById("bertemu").value,
+  tujuan: document.getElementById("tujuan").value,
+  rombongan: document.getElementById("rombongan").value,
+  petugas: document.getElementById("petugas").value,
+  foto: capturedFoto
+};
 
   try {
-    await fetch(SHEET_API_URL, {
+    const res = await fetch(SHEET_API_URL, {
       method: "POST",
-      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
-    // ✅ SIMPAN KE LOCAL STORAGE UNTUK ADMIN
-    const guests = JSON.parse(localStorage.getItem("guests") || "[]");
-    guests.push(data);
-    localStorage.setItem("guests", JSON.stringify(guests));
+    const result = await res.json();
 
-    // ✅ ALERT HANYA SEKALI
-    alert("✅ Data tamu berhasil disimpan ke Spreadsheet!");
-
-    this.reset();
-    document.getElementById("previewFoto").classList.add("hidden");
-    capturedFoto = "";
-    showPage("home");
+    if (result.status === "success") {
+      alert("✅ Data tamu berhasil disimpan!");
+      this.reset();
+      document.getElementById("previewFoto").classList.add("hidden");
+      capturedFoto = "";
+      showPage("home");
+    } else {
+      throw new Error(result.message);
+    }
 
   } catch (err) {
     console.error(err);
-    alert("❌ Gagal menghubungi server Spreadsheet!");
+    alert("❌ Gagal menyimpan ke Spreadsheet!");
   }
 });
-
-    } catch (err) {
-        alert("Gagal menghubungi server Spreadsheet!");
-        console.error(err);
-    }
-});
-
-        // ADMIN
-        function deleteGuest(index) {
-            if (confirm("Yakin ingin menghapus data tamu ini?")) {
-                const guests = JSON.parse(localStorage.getItem("guests") || "[]");
-                guests.splice(index, 1);
-                localStorage.setItem("guests", JSON.stringify(guests));
-                loadGuests();
-            }
-        }
-        function openModal(index) { const guests = JSON.parse(localStorage.getItem("guests") || "[]"), src = guests[index]?.foto || ""; if (!src) return; document.getElementById("modalImage").src = src; document.getElementById("modalFoto").classList.remove("hidden"); }
         function closeModal() { document.getElementById("modalFoto").classList.add("hidden"); }
 
         function checkAdminAccess() { if (localStorage.getItem("isAdminLoggedIn") !== "true") showPage("adminLogin"); else loadGuests(); }
         document.getElementById("loginForm").addEventListener("submit", e => { e.preventDefault(); if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "admin123") { localStorage.setItem("isAdminLoggedIn", "true"); showPage("admin"); loadGuests(); } else document.getElementById("loginError").classList.remove("hidden"); });
         function logoutAdmin() { localStorage.removeItem("isAdminLoggedIn"); alert("Logout berhasil!"); showPage("adminLogin"); }
         function togglePassword() { const f = document.getElementById("password"); f.type = f.type === "password" ? "text" : "password"; }
-        function exportToExcel() { const guests = JSON.parse(localStorage.getItem("guests") || "[]"); if (!guests.length) { alert("Belum ada data tamu!"); return; } const data = guests.map(g => ({ Waktu: new Date(g.waktu).toLocaleString(), NIK: g.nik, Nama: g.nama, Alamat: g.alamat, Telepon: g.telepon, Instansi: g.instansi, Bertemu: g.bertemu, Tujuan: g.tujuan, Rombongan: g.rombongan })); const ws = XLSX.utils.json_to_sheet(data), wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data Tamu"); XLSX.writeFile(wb, "Data_Tamu.xlsx"); }
 
-        let editIndex = null;
-
-function editGuest(index) {
-  const guests = JSON.parse(localStorage.getItem("guests") || "[]");
-  const g = guests[index];
-  if (!g) return;
-
-  editIndex = index;
-
-  document.getElementById("editNIK").value = g.nik;
-  document.getElementById("editNama").value = g.nama;
-  document.getElementById("editAlamat").value = g.alamat;
-  document.getElementById("editTelepon").value = g.telepon;
-  document.getElementById("editInstansi").value = g.instansi;
-  document.getElementById("editBertemu").value = g.bertemu;
-  document.getElementById("editTujuan").value = g.tujuan;
-  document.getElementById("editRombongan").value = g.rombongan;
-  document.getElementById("editPetugas").value = g.petugas;
-
-  document.getElementById("modalEdit").classList.remove("hidden");
-}
-
-function closeEditModal() {
-    document.getElementById("modalEdit").classList.add("hidden");
-}
-
-document.getElementById("editForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const guests = JSON.parse(localStorage.getItem("guests") || "[]");
-
-    if (editIndex !== null && guests[editIndex]) {
-        guests[editIndex].nik = document.getElementById("editNIK").value;
-        guests[editIndex].nama = document.getElementById("editNama").value;
-        guests[editIndex].alamat = document.getElementById("editAlamat").value;
-        guests[editIndex].telepon = document.getElementById("editTelepon").value;
-        guests[editIndex].instansi = document.getElementById("editInstansi").value;
-        guests[editIndex].bertemu = document.getElementById("editBertemu").value;
-        guests[editIndex].tujuan = document.getElementById("editTujuan").value;
-        guests[editIndex].rombongan = document.getElementById("editRombongan").value;
-        guests[editIndex].petugas = document.getElementById("editPetugas").value;
-
-        localStorage.setItem("guests", JSON.stringify(guests));
-        loadGuests();
-        closeEditModal();
-        alert("Data tamu berhasil diperbarui!");
-    }
-});
 
 // === SLIDESHOW HOME ===
 const homeImages = [
@@ -524,26 +367,29 @@ setInterval(changeTamuBackground, 5000);
 let currentPage = 1;
 const itemsPerPage = 10;
 
-function loadGuests() {
-    const guests = JSON.parse(localStorage.getItem("guests") || "[]");
+async function loadGuests() {
+  try {
+    const res = await fetch(SHEET_API_URL);
+    const guests = await res.json(); // ✅ DATA LANGSUNG DARI SPREADSHEET
+
     const search = document.getElementById("searchInput").value.toLowerCase();
     const startDate = document.getElementById("startDate")?.value || "";
     const endDate = document.getElementById("endDate")?.value || "";
     const list = document.getElementById("guestList");
 
-    // === Filter data ===
     const filtered = guests.filter(e => {
-        const tanggal = new Date(e.waktu).toISOString().slice(0, 10);
-        const cocokSearch =
-            e.nama.toLowerCase().includes(search) ||
-            tanggal.includes(search);
-        let cocokTanggal = true;
-        if (startDate && tanggal < startDate) cocokTanggal = false;
-        if (endDate && tanggal > endDate) cocokTanggal = false;
-        return cocokSearch && cocokTanggal;
+      const tanggal = new Date(e.waktu).toISOString().slice(0, 10);
+      const cocokSearch =
+        e.nama.toLowerCase().includes(search) ||
+        tanggal.includes(search);
+
+      let cocokTanggal = true;
+      if (startDate && tanggal < startDate) cocokTanggal = false;
+      if (endDate && tanggal > endDate) cocokTanggal = false;
+
+      return cocokSearch && cocokTanggal;
     });
 
-    // === Pagination logic ===
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     if (currentPage > totalPages) currentPage = totalPages || 1;
 
@@ -551,54 +397,47 @@ function loadGuests() {
     const end = start + itemsPerPage;
     const paginatedData = filtered.slice(start, end);
 
-    // === Render tabel ===
     list.innerHTML = paginatedData.map((e, i) => `
-        <tr class="border-b hover:bg-gray-50 h-14">
-            <td class="p-2">${new Date(e.waktu).toLocaleString()}</td>
-            <td class="p-2">${e.nik}</td>
-            <td class="p-2">${e.nama}</td>
-            <td class="p-2">${e.alamat}</td>
-            <td class="p-2">${e.telepon}</td>
-            <td class="p-2">${e.instansi}</td>
-            <td class="p-2">${e.bertemu}</td>
-            <td class="p-2">${e.tujuan}</td>
-            <td class="p-2">${e.rombongan}</td>
-            <td class="p-2">
-                ${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModal('${start + i}')"/>` : '-'}
-            </td>
-            <td class="p-2">${e.petugas}</td>
-            <td class="p-2 flex gap-2">
-                <button onclick="editGuest(${start + i})" class="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500">✏️</button>
-                <button onclick="deleteGuest(${start + i})" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">🗑️</button>
-            </td>
-        </tr>
+      <tr class="border-b hover:bg-gray-50 h-14">
+        <td class="p-2">${new Date(e.waktu).toLocaleString()}</td>
+        <td class="p-2">${e.nik}</td>
+        <td class="p-2">${e.nama}</td>
+        <td class="p-2">${e.alamat}</td>
+        <td class="p-2">${e.telepon}</td>
+        <td class="p-2">${e.instansi}</td>
+        <td class="p-2">${e.bertemu}</td>
+        <td class="p-2">${e.tujuan}</td>
+        <td class="p-2">${e.rombongan}</td>
+        <td class="p-2">
+          ${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModalUrl('${e.foto}')"/>` : '-'}
+        </td>
+        <td class="p-2">${e.petugas}</td>
+      </tr>
     `).join("");
 
-    // === Update kontrol pagination ===
     document.getElementById("pageInfo").textContent =
-        filtered.length === 0
-            ? "Tidak ada data"
-            : `Halaman ${currentPage} dari ${totalPages}`;
+      filtered.length === 0
+        ? "Tidak ada data"
+        : `Halaman ${currentPage} dari ${totalPages}`;
 
-    document.getElementById("prevPage").disabled = currentPage === 1;
-    document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
+    updateStatsOnline(filtered);
 
-    updateStats();
+  } catch (err) {
+    console.error(err);
+    alert("❌ Gagal mengambil data dari Spreadsheet!");
+  }
 }
 
-// Tombol prev/next
-document.getElementById("prevPage").addEventListener("click", () => {
-    if (currentPage > 1) {
-        currentPage--;
-        loadGuests();
-    }
-});
+document.getElementById("nextPage").addEventListener("click", async () => {
+  const res = await fetch(SHEET_API_URL);
+  const guests = await res.json();
+  const totalPages = Math.ceil(guests.length / itemsPerPage);
 
-document.getElementById("nextPage").addEventListener("click", () => {
+  if (currentPage < totalPages) {
     currentPage++;
     loadGuests();
+  }
 });
-
 // Refresh otomatis saat search atau filter berubah
 document.getElementById("searchInput").addEventListener("input", () => {
     currentPage = 1;
@@ -613,17 +452,27 @@ document.getElementById("endDate").addEventListener("change", () => {
     loadGuests();
 });
 
-function updateStats() {
-  const guests = JSON.parse(localStorage.getItem("guests") || "[]");
-
-  const total = guests.length;
-  const individu = guests.filter(g => g.rombongan === "Individu").length;
-  const rombongan = guests.filter(g => g.rombongan === "Rombongan").length;
+function updateStatsOnline(data) {
+  const total = data.length;
+  const individu = data.filter(g => g.rombongan === "Individu").length;
+  const rombongan = data.filter(g => g.rombongan === "Rombongan").length;
 
   document.getElementById("statTotal").textContent = total;
   document.getElementById("statIndividu").textContent = individu;
   document.getElementById("statRombongan").textContent = rombongan;
 }
+
+
+function openModalUrl(url) {
+  document.getElementById("modalImage").src = url;
+  document.getElementById("modalFoto").classList.remove("hidden");
+}
+document.getElementById("prevPage").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    loadGuests();
+  }
+});
 
     </script>
 </body>
