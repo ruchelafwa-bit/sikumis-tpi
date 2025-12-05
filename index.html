@@ -411,24 +411,25 @@ async function loadGuests() {
 
     console.log("API response:", result);
 
-    // ✅ API kamu mengembalikan ARRAY LANGSUNG
-    if (!Array.isArray(result)) {
-      throw new Error("Response API bukan array");
+    // ✅ AMBIL ARRAY YANG BENAR
+    const rawData = result.data || [];
+    if (!Array.isArray(rawData)) {
+      throw new Error("Format data API salah");
     }
 
-    // ✅ Mapping dari FIELD Spreadsheet → FIELD yang dipakai HTML
-    const guests = result.map(r => ({
-      waktu: r.Timestamp || r.waktu || "",
-      nik: r.NIK || r.nik || "",
-      nama: r.Nama || r.nama || "",
-      alamat: r.Alamat || r.alamat || "",
-      telepon: r.Telepon || r.telepon || "",
-      instansi: r.Instansi || r.instansi || "",
-      bertemu: r.Bertemu || r.bertemu || "",
-      tujuan: r.Tujuan || r.tujuan || "",
-      rombongan: r.Rombongan || r.rombongan || "",
-      petugas: r.Petugas || r.petugas || "",
-      foto: r.Foto || r.foto || ""
+    // ✅ Mapping field Spreadsheet ke field Web
+    const guests = rawData.map(r => ({
+      waktu: r.Timestamp || "",
+      nik: r.NIK || "",
+      nama: r.Nama || "",
+      alamat: r.Alamat || "",
+      telepon: r["No. Telp"] || r.Telepon || "",
+      instansi: r.Instansi || "",
+      bertemu: r["Bertemu Dengan"] || r.Bertemu || "",
+      tujuan: r["Tujuan Kunjungan"] || r.Tujuan || "",
+      rombongan: r["Individu/Rombongan"] || r.Rombongan || "",
+      petugas: r.Petugas || "",
+      foto: r.Foto || ""
     }));
 
     const search = document.getElementById("searchInput").value.toLowerCase();
@@ -442,7 +443,7 @@ async function loadGuests() {
       const tanggal = new Date(e.waktu).toISOString().slice(0, 10);
 
       const cocokSearch =
-        e.nama.toLowerCase().includes(search) ||
+        (e.nama || "").toLowerCase().includes(search) ||
         tanggal.includes(search);
 
       let cocokTanggal = true;
@@ -544,5 +545,4 @@ document.getElementById("prevPage").addEventListener("click", () => {
 </body>
 
 </html>
-
 
