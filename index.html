@@ -373,10 +373,47 @@ setInterval(changeTamuBackground, 5000);
 let currentPage = 1;
 const itemsPerPage = 10;
 
+function parseTanggalIndonesia(input) {
+  if (!input) return "";
+
+  if (input instanceof Date && !isNaN(input)) {
+    return input.toISOString().slice(0, 10);
+  }
+
+  if (typeof input === "number") {
+    const utc_days = Math.floor(input - 25569);
+    const utc_value = utc_days * 86400;
+    const d = new Date(utc_value * 1000);
+    return d.toISOString().slice(0, 10);
+  }
+
+  const s = String(input).trim();
+
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+  if (m) {
+    const d = m[1].padStart(2,"0");
+    const mo = m[2].padStart(2,"0");
+    let y = m[3];
+    if (y.length === 2) y = "20" + y;
+    return `${y}-${mo}-${d}`;
+  }
+
+  const d2 = new Date(s);
+  if (!isNaN(d2)) return d2.toISOString().slice(0, 10);
+
+  return "";
+}
+
 async function loadGuests() {
   try {
     const res = await fetch(SHEET_API_URL);
-    const guests = await res.json(); // ✅ DATA LANGSUNG DARI SPREADSHEET
+    const result = await res.json();
+
+    if (!result.data || !Array.isArray(result.data)) {
+      throw new Error("Format data dari API tidak valid");
+    }
+
+    const guests = result.data; // ✅ AMBIL ARRAY ASLINYA
 
     const search = document.getElementById("searchInput").value.toLowerCase();
     const startDate = document.getElementById("startDate")?.value || "";
@@ -384,18 +421,20 @@ async function loadGuests() {
     const list = document.getElementById("guestList");
 
     const filtered = guests.filter(e => {
-  const tanggal = parseTanggalIndonesia(e.waktu);
+      if (!e.waktu || !e.nama) return false;
 
-  const cocokSearch =
-    (e.nama || "").toLowerCase().includes(search) ||
-    tanggal.includes(search);
+      const tanggal = parseTanggalIndonesia(e.waktu);
 
-  let cocokTanggal = true;
-  if (startDate && tanggal < startDate) cocokTanggal = false;
-  if (endDate && tanggal > endDate) cocokTanggal = false;
+      const cocokSearch =
+        e.nama.toLowerCase().includes(search) ||
+        tanggal.includes(search);
 
-  return cocokSearch && cocokTanggal;
-});
+      let cocokTanggal = true;
+      if (startDate && tanggal < startDate) cocokTanggal = false;
+      if (endDate && tanggal > endDate) cocokTanggal = false;
+
+      return cocokSearch && cocokTanggal;
+    });
 
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     if (currentPage > totalPages) currentPage = totalPages || 1;
@@ -407,18 +446,18 @@ async function loadGuests() {
     list.innerHTML = paginatedData.map((e, i) => `
       <tr class="border-b hover:bg-gray-50 h-14">
         <td class="p-2">${new Date(e.waktu).toLocaleString()}</td>
-        <td class="p-2">${e.nik}</td>
-        <td class="p-2">${e.nama}</td>
-        <td class="p-2">${e.alamat}</td>
-        <td class="p-2">${e.telepon}</td>
-        <td class="p-2">${e.instansi}</td>
-        <td class="p-2">${e.bertemu}</td>
-        <td class="p-2">${e.tujuan}</td>
-        <td class="p-2">${e.rombongan}</td>
+        <td class="p-2">${e.nik || "-"}</td>
+        <td class="p-2">${e.nama || "-"}</td>
+        <td class="p-2">${e.alamat || "-"}</td>
+        <td class="p-2">${e.telepon || "-"}</td>
+        <td class="p-2">${e.instansi || "-"}</td>
+        <td class="p-2">${e.bertemu || "-"}</td>
+        <td class="p-2">${e.tujuan || "-"}</td>
+        <td class="p-2">${e.rombongan || "-"}</td>
         <td class="p-2">
           ${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModalUrl('${e.foto}')"/>` : '-'}
         </td>
-        <td class="p-2">${e.petugas}</td>
+        <td class="p-2">${e.petugas || "-"}</td>
       </tr>
     `).join("");
 
@@ -437,8 +476,18 @@ async function loadGuests() {
 
 document.getElementById("nextPage").addEventListener("click", async () => {
   const res = await fetch(SHEET_API_URL);
-  const guests = await res.json();
+document.getElementById("nextPage").addEventListener("click", async () => {
+  const res = await fetch(SHEET_API_URL);
+  const result = await res.json();
+  const guests = result.data || [];
+
   const totalPages = Math.ceil(guests.length / itemsPerPage);
+
+  if (currentPage < totalPages) {
+    currentPage++;
+    loadGuests();
+  }
+});
 
   if (currentPage < totalPages) {
     currentPage++;
@@ -485,9 +534,4 @@ document.getElementById("prevPage").addEventListener("click", () => {
 </body>
 
 </html>
-
-
-
-
-
 
