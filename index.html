@@ -230,7 +230,7 @@ class="mt-4 py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
     </div>
     <script>
 
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyswvouJg-pJXwgAbm0jn9lwd9dIhYhRgRfnsjDsVBDh5daABhzNYXWjQkYlV7GBYxV/exec"; 
+const SHEET_API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AKfycbz7OrUns2Ym9ISgMzm7gz-G3vrxJmZ15_c-wX-wTCjN9nowSLHlhYA6_l-eSvPlDf9J";
 
        const pages = ["home", "tamu", "adminLogin", "admin"];
 
@@ -299,29 +299,35 @@ document.getElementById("guestForm").addEventListener("submit", async function (
   foto: capturedFoto
 };
 
-  try {
-    const res = await fetch(SHEET_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+try {
+  const formData = new FormData();
 
-    const result = await res.json();
-
-    if (result.status === "success") {
-      alert("✅ Data tamu berhasil disimpan!");
-      this.reset();
-      document.getElementById("previewFoto").classList.add("hidden");
-      capturedFoto = "";
-      showPage("home");
-    } else {
-      throw new Error(result.message);
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("❌ Gagal menyimpan ke Spreadsheet!");
+  for (const key in data) {
+    formData.append(key, data[key]);
   }
+
+  const res = await fetch(SHEET_API_URL, {
+    method: "POST",
+    body: formData
+  });
+
+  const text = await res.text();
+  const result = JSON.parse(text);
+
+  if (result.status === "success") {
+    alert("✅ Data tamu berhasil disimpan!");
+    this.reset();
+    document.getElementById("previewFoto").classList.add("hidden");
+    capturedFoto = "";
+    showPage("home");
+  } else {
+    alert("❌ " + result.message);
+  }
+
+} catch (err) {
+  console.error(err);
+  alert("❌ Gagal menyimpan ke Spreadsheet!");
+}
 });
         function closeModal() { document.getElementById("modalFoto").classList.add("hidden"); }
 
