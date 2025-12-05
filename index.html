@@ -409,43 +409,113 @@ async function loadGuests() {
     const res = await fetch(SHEET_API_URL);
     const result = await res.json();
 
-    if (!result.data || !Array.isArray(result.data)) {
-      throw new Error("Format data dari API tidak valid");
+    console.log("API raw response:", result); // <-- penting: lihat bentuk respons di Console
+
+    // Support banyak bentuk respons:
+    // 1) API mengembalikan { data: [...] }
+    // 2) API mengembalikan { result: [...] }
+    // 3) API langsung mengembalikan array [...]
+    // 4) API mengembalikan { rows: [...] } (jaga2)
+    let guests;
+    if (Array.isArray(result)) {
+      guests = result;
+    } else if (result && Array.isArray(result.data)) {
+      guests = result.data;
+    } else if (result && Array.isArray(result.result)) {
+      guests = result.result;
+    } else if (result && Array.isArray(result.rows)) {
+      guests = result.rows;
+    } else if (result && result.values && Array.isArray(result.values)) {
+      // beberapa implementasi mengirim objek sheet: { values: [ [row], [row] ] }
+      // coba ubah ke object dengan keys sesuai yang kamu pakai (waktu,nama,...) jika perlu
+      console.warn("Got sheet-style values array; trying to map to objects");
+      const values = result.values;
+      const headers = values[0] || [];
+      guests = values.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = r[i]);
+        return obj;
+      });
+    } else {
+      throw new Error("Format data dari API tidak valid — lihat console untuk response mentah");
     }
 
-    const guests = result.data; // ✅ AMBIL ARRAY ASLINYA
+    // sekarang guests harus array
+    // normalisasi: pastikan setiap item punya properti yang kita pakai
+    guests = guests.map(g => ({
+      waktu: g.waktu ?? g.Timestamp ?? g.timestamp ?? g.Time ?? g.time ?? g[0] ?? "",
+      nik: g.nik ?? g.NIK ?? g[1] ?? "",
+      nama: g.nama ?? g.Nama ?? g[2] ?? "",
+      alamat: g.alamat ?? g.Alamat ?? g[3] ?? "",
+      telepon: g.telepon ?? g.NoTelp ?? g[4] ?? "",
+      instansi: g.instansi ?? g.Instansi ?? g[5] ?? "",
+      bertemu: g.bertemu ?? g.Bertemu ?? g[6] ?? "",
+      tujuan: g.tujuan ?? g.Tujuan ?? g[7] ?? "",
+      rombongan: g.rombongan ?? g.IndividuRombor ?? g[8] ?? "",
+      petugas: g.petugas ?? g.Petugas ?? g[9] ?? "",
+      foto: g.foto ?? g.Foto ?? g[10] ?? ""
+    }));
 
-    const search = document.getElementById("searchInput").value.toLowerCase();
+    // ambil filter input
+    const search = (document.getElementById("searchInput").value || "").toLowerCase();
     const startDate = document.getElementById("startDate")?.value || "";
     const endDate = document.getElementById("endDate")?.value || "";
     const list = document.getElementById("guestList");
 
     const filtered = guests.filter(e => {
-      if (!e.waktu || !e.nama) return false;
+      if (!e.waktu && !e.nama) return false;
 
-      const tanggal = parseTanggalIndonesia(e.waktu);
+      // coba normalisasi tanggal: kalau sudah ISO atau timestamp string ok
+      let tanggal = "";
+      try {
+        // jika waktunya adalah angka Excel (misal "44900"), parse
+        if (!isNaN(Number(e.waktu)) && String(e.waktu).length <= 8) {
+          // angka: mungkin Excel serial date
+          const serial = Number(e.waktu);
+          const d = new Date((serial - 25569) * 86400 * 1000);
+          tanggal = d.toISOString().slice(0, 10);
+        } else {
+          const d = new Date(e.waktu);
+          if (!isNaN(d)) tanggal = d.toISOString().slice(0, 10);
+          else {
+            // kalau format "dd/mm/yyyy" -> ubah manual
+            const m = String(e.waktu).match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+            if (m) {
+              let y = m[3]; if (y.length === 2) y = "20" + y;
+              const mo = m[2].padStart(2, "0");
+              const da = m[1].padStart(2, "0");
+              tanggal = `${y}-${mo}-${da}`;
+            } else {
+              tanggal = "";
+            }
+          }
+        }
+      } catch (err) {
+        tanggal = "";
+      }
 
       const cocokSearch =
-        e.nama.toLowerCase().includes(search) ||
-        tanggal.includes(search);
+        (e.nama || "").toString().toLowerCase().includes(search) ||
+        (tanggal || "").includes(search);
 
       let cocokTanggal = true;
-      if (startDate && tanggal < startDate) cocokTanggal = false;
-      if (endDate && tanggal > endDate) cocokTanggal = false;
+      if (startDate && tanggal && tanggal < startDate) cocokTanggal = false;
+      if (endDate && tanggal && tanggal > endDate) cocokTanggal = false;
 
       return cocokSearch && cocokTanggal;
     });
 
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-    if (currentPage > totalPages) currentPage = totalPages || 1;
+    // pagination
+    const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
 
     const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const paginatedData = filtered.slice(start, end);
+    const paginatedData = filtered.slice(start, start + itemsPerPage);
 
-    list.innerHTML = paginatedData.map((e, i) => `
+    // render tabel
+    list.innerHTML = paginatedData.map((e) => `
       <tr class="border-b hover:bg-gray-50 h-14">
-        <td class="p-2">${new Date(e.waktu).toLocaleString()}</td>
+        <td class="p-2">${new Date(e.waktu).toLocaleString ? (new Date(e.waktu).toLocaleString()) : (e.waktu || "-")}</td>
         <td class="p-2">${e.nik || "-"}</td>
         <td class="p-2">${e.nama || "-"}</td>
         <td class="p-2">${e.alamat || "-"}</td>
@@ -454,23 +524,19 @@ async function loadGuests() {
         <td class="p-2">${e.bertemu || "-"}</td>
         <td class="p-2">${e.tujuan || "-"}</td>
         <td class="p-2">${e.rombongan || "-"}</td>
-        <td class="p-2">
-          ${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModalUrl('${e.foto}')"/>` : '-'}
-        </td>
+        <td class="p-2">${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModalUrl('${e.foto}')"/>` : '-'}</td>
         <td class="p-2">${e.petugas || "-"}</td>
       </tr>
     `).join("");
 
     document.getElementById("pageInfo").textContent =
-      filtered.length === 0
-        ? "Tidak ada data"
-        : `Halaman ${currentPage} dari ${totalPages}`;
+      filtered.length === 0 ? "Tidak ada data" : `Halaman ${currentPage} dari ${totalPages}`;
 
     updateStatsOnline(filtered);
 
   } catch (err) {
     console.error(err);
-    alert("❌ Gagal mengambil data dari Spreadsheet!");
+    alert("❌ Gagal mengambil data dari Spreadsheet! (lihat console)");
   }
 }
 
