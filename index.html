@@ -475,25 +475,22 @@ async function loadGuests() {
 }
 
 document.getElementById("nextPage").addEventListener("click", async () => {
-  const res = await fetch(SHEET_API_URL);
-document.getElementById("nextPage").addEventListener("click", async () => {
-  const res = await fetch(SHEET_API_URL);
-  const result = await res.json();
-  const guests = result.data || [];
+  try {
+    const res = await fetch(SHEET_API_URL);
+    const result = await res.json();
+    const guests = result.data || [];
 
-  const totalPages = Math.ceil(guests.length / itemsPerPage);
+    const totalPages = Math.ceil(guests.length / itemsPerPage);
 
-  if (currentPage < totalPages) {
-    currentPage++;
-    loadGuests();
+    if (currentPage < totalPages) {
+      currentPage++;
+      loadGuests();
+    }
+  } catch (e) {
+    console.error("NextPage error:", e);
   }
 });
 
-  if (currentPage < totalPages) {
-    currentPage++;
-    loadGuests();
-  }
-});
 // Refresh otomatis saat search atau filter berubah
 document.getElementById("searchInput").addEventListener("input", () => {
     currentPage = 1;
