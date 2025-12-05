@@ -99,28 +99,13 @@
                     <option value="Dayat">Dayat</option>
                     <option value="Firdaus">Firdaus</option>
                 </select>
+  <button type="submit"
+  class="w-full py-3 bg-yellow-400 text-sky-900 font-bold rounded hover:bg-yellow-500">
+  Kirim
+</button>
 
-                <!-- WEBCAM FOTO -->
-                <div>
-                    <label class="block mb-2 font-medium text-center">Foto Wajah Tamu</label>
-                    <video id="video" autoplay playsinline
-                        class="mx-auto w-64 h-48 bg-black rounded-lg border-2 border-gray-300"></video>
-                    <button type="button" onclick="takeSnapshot()"
-                        class="mt-3 px-5 py-2 bg-yellow-400 text-sky-900 font-semibold rounded hover:bg-yellow-500 transition flex items-center justify-center mx-auto">📸
-                        Ambil Foto</button>
-                    <canvas id="canvas" class="hidden"></canvas>
-                    <img id="previewFoto"
-                        class="hidden mx-auto mt-3 w-32 h-32 object-cover rounded border-2 border-gray-300"
-                        alt="Preview Foto">
-                </div>
+</form>
 
-                <button type="submit"
-                    class="w-full py-3 bg-sky-700 text-white rounded-lg font-bold hover:bg-sky-800">Kirim</button>
-            </form>
-            <button onclick="showPage('home')"
-                class="mt-4 w-full py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">⬅ Kembali ke Menu
-                Utama</button>
-        </div>
     </section>
 
     <!-- ADMIN LOGIN -->
@@ -197,7 +182,6 @@
                             <th class="p-2">Bertemu</th>
                             <th class="p-2">Tujuan</th>
                             <th class="p-2">Rombongan</th>
-                            <th class="p-2">Foto</th>
                             <th class="p-2">Petugas</th>
                         </tr>
                     </thead>
@@ -219,14 +203,6 @@ class="mt-4 py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
 
         </div>
     </section>
-
-    <!-- MODAL FOTO -->
-    <div id="modalFoto" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
-        <div class="bg-white p-4 rounded shadow max-w-[90vw] max-h-[90vh] relative">
-            <button onclick="closeModal()"
-                class="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded">✖</button>
-            <img id="modalImage" src="" alt="Foto besar" class="max-w-full max-h-[80vh] rounded" />
-        </div>
     </div>
     <script>
 
@@ -237,37 +213,10 @@ const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbx4gCtVDESvzbGzDd
 function showPage(page) {
   pages.forEach(p => document.getElementById(p).classList.add("hidden"));
   document.getElementById(page).classList.remove("hidden");
-
-  if (page === "tamu") {
-    startWebcam();   // ✅ supaya kamera nyala
-  }
-
   if (page === "admin") {
     checkAdminAccess(); // ✅ supaya admin tidak bisa dibuka tanpa login
   }
 }
-
-        // WEBCAM
-        let currentStream, capturedFoto = "";
-        async function startWebcam() {
-  try {
-    if (currentStream) {
-      currentStream.getTracks().forEach(track => track.stop());
-    }
-
-    currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
-    const video = document.getElementById("video");
-    video.srcObject = currentStream;
-    await video.play();
-  } catch (err) {
-    alert("Tidak bisa mengakses kamera: " + err.message);
-  }
-}
-        function takeSnapshot() {
-            const video = document.getElementById("video"), canvas = document.getElementById("canvas"), preview = document.getElementById("previewFoto"), ctx = canvas.getContext("2d");
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight; ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            capturedFoto = canvas.toDataURL("image/png"); preview.src = capturedFoto; preview.classList.remove("hidden");
-        }
 
 document.getElementById("guestForm").addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -279,12 +228,6 @@ document.getElementById("guestForm").addEventListener("submit", async function (
     alert("Nomor telepon minimal 10 digit angka!");
     return;
   }
-
-  if (!capturedFoto) {
-    alert("Silakan ambil foto terlebih dahulu!");
-    return;
-  }
-
   const data = {
   waktu: new Date().toISOString(),   // ✅ WAJIB DITAMBAH
   nik,
@@ -296,7 +239,6 @@ document.getElementById("guestForm").addEventListener("submit", async function (
   tujuan: document.getElementById("tujuan").value,
   rombongan: document.getElementById("rombongan").value,
   petugas: document.getElementById("petugas").value,
-  foto: capturedFoto
 };
 
 try {
@@ -316,9 +258,7 @@ try {
 
   if (result.status === "success") {
     alert("✅ Data tamu berhasil disimpan!");
-    this.reset();
-    document.getElementById("previewFoto").classList.add("hidden");
-    capturedFoto = "";
+    this.reset(); 
     showPage("home");
   } else {
     alert("❌ " + result.message);
@@ -329,7 +269,6 @@ try {
   alert("❌ Gagal menyimpan ke Spreadsheet!");
 }
 });
-        function closeModal() { document.getElementById("modalFoto").classList.add("hidden"); }
 
         function checkAdminAccess() { if (localStorage.getItem("isAdminLoggedIn") !== "true") showPage("adminLogin"); else loadGuests(); }
         document.getElementById("loginForm").addEventListener("submit", e => { e.preventDefault(); if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "admin123") { localStorage.setItem("isAdminLoggedIn", "true"); showPage("admin"); loadGuests(); } else document.getElementById("loginError").classList.remove("hidden"); });
@@ -433,7 +372,6 @@ async function loadGuests() {
         tujuan: r["Tujuan Kunjungan"] || r.Tujuan || r.tujuan || "",
         rombongan: r["Individu/Rombongan"] || r.Rombongan || r.rombongan || "",
         petugas: r.Petugas || r.petugas || "",
-        foto: r.Foto || r.foto || ""
       };
     });
 
@@ -482,7 +420,6 @@ async function loadGuests() {
         <td class="p-2">${e.bertemu || "-"}</td>
         <td class="p-2">${e.tujuan || "-"}</td>
         <td class="p-2">${e.rombongan || "-"}</td>
-        <td class="p-2">${e.foto ? `<img src="${e.foto}" class="w-20 h-16 object-cover rounded cursor-pointer" onclick="openModalUrl('${e.foto}')"/>` : '-'}</td>
         <td class="p-2">${e.petugas || "-"}</td>
       </tr>
     `).join("");
@@ -538,11 +475,6 @@ function updateStatsOnline(data) {
   document.getElementById("statRombongan").textContent = rombongan;
 }
 
-
-function openModalUrl(url) {
-  document.getElementById("modalImage").src = url;
-  document.getElementById("modalFoto").classList.remove("hidden");
-}
 document.getElementById("prevPage").addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
