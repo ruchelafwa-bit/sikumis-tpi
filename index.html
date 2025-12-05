@@ -384,7 +384,8 @@ async function loadGuests() {
     const list = document.getElementById("guestList");
 
     const filtered = guests.filter(e => {
-      const tanggal = new Date(e.waktu).toISOString().slice(0, 10);
+ let tglObj = new Date(e.waktu);
+let tanggal = isNaN(tglObj) ? "" : tglObj.toISOString().slice(0, 10);
       const cocokSearch =
         e.nama.toLowerCase().includes(search) ||
         tanggal.includes(search);
@@ -484,5 +485,6 @@ document.getElementById("prevPage").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
