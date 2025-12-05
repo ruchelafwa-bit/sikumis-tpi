@@ -384,18 +384,18 @@ async function loadGuests() {
     const list = document.getElementById("guestList");
 
     const filtered = guests.filter(e => {
- let tglObj = new Date(e.waktu);
-let tanggal = isNaN(tglObj) ? "" : tglObj.toISOString().slice(0, 10);
-      const cocokSearch =
-        e.nama.toLowerCase().includes(search) ||
-        tanggal.includes(search);
+  const tanggal = parseTanggalIndonesia(e.waktu);
 
-      let cocokTanggal = true;
-      if (startDate && tanggal < startDate) cocokTanggal = false;
-      if (endDate && tanggal > endDate) cocokTanggal = false;
+  const cocokSearch =
+    e.nama.toLowerCase().includes(search) ||
+    tanggal.includes(search);
 
-      return cocokSearch && cocokTanggal;
-    });
+  let cocokTanggal = true;
+  if (startDate && tanggal < startDate) cocokTanggal = false;
+  if (endDate && tanggal > endDate) cocokTanggal = false;
+
+  return cocokSearch && cocokTanggal;
+});
 
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     if (currentPage > totalPages) currentPage = totalPages || 1;
@@ -485,6 +485,7 @@ document.getElementById("prevPage").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
