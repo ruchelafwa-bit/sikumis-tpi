@@ -383,12 +383,14 @@ async function loadGuests() {
     const endDate = document.getElementById("endDate")?.value || "";
     const list = document.getElementById("guestList");
 
-    const filtered = guests.filter(e => {
-  const tanggal = parseTanggalIndonesia(e.waktu);
+    cconst filtered = guests.filter(e => {
+  const nama = (e.nama || "").toLowerCase();
+  const tanggal = parseTanggalIndonesia(e.waktu || "");
+  const searchText = search.toLowerCase();
 
   const cocokSearch =
-    e.nama.toLowerCase().includes(search) ||
-    tanggal.includes(search);
+    nama.includes(searchText) ||
+    tanggal.includes(searchText);
 
   let cocokTanggal = true;
   if (startDate && tanggal < startDate) cocokTanggal = false;
@@ -485,6 +487,7 @@ document.getElementById("prevPage").addEventListener("click", () => {
 </body>
 
 </html>
+
 
 
 
