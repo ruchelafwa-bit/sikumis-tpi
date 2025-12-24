@@ -7,448 +7,827 @@
     <title>Buku Tamu - Kantor Imigrasi Kelas I TPI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .modal-backdrop {
-            background: rgba(0, 0, 0, 0.6);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
         }
-        /* Slideshow background */
+
+        /* Smooth page transitions */
+        .page-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Slideshow background with zoom effect */
         .bg-slideshow {
-        background-size: cover;
-        background-position: center;
-        transition: background-image 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: kenburns 20s infinite alternate;
+        }
+
+        @keyframes kenburns {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* Glassmorphism cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animated button */
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        /* Input animations */
+        input, select {
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+            border-color: #0ea5e9;
+        }
+
+        /* Table animations */
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.1) 0%, rgba(14, 165, 233, 0.05) 100%);
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stats card animation */
+        .stat-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .stat-card:hover::after {
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Pulse animation for logo */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #0ea5e9, #0369a1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #0369a1, #0ea5e9);
+        }
+
+        /* Info card hover effect */
+        .info-card {
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Admin button glow */
+        .admin-btn {
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+            to { box-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
+        }
+
+        /* Page number animation */
+        #pageInfo {
+            transition: all 0.3s ease;
+        }
+
+        /* Fade in up animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Button ripple effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
         }
     </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
 
     <!-- HALAMAN HOME -->
     <section id="home"
-    class="min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-slideshow"
+    class="page-section min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-slideshow"
     style="background-image: url('imigrasi.jpg');">
-        <div class="absolute inset-0 bg-sky-900/70"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-sky-900/80 via-sky-900/70 to-sky-900/80"></div>
+        
         <button onclick="showPage('adminLogin')"
-            class="absolute top-5 right-5 px-4 py-2 bg-yellow-400 text-sky-900 rounded-full font-bold shadow hover:bg-yellow-500 z-20">🔑
-            Admin</button>
-        <div class="relative bg-white/10 backdrop-blur-md p-10 rounded-2xl shadow-2xl max-w-xl mx-auto z-10">
-            <img src="logouptimi.png" alt="Logo Imigrasi" class="w-36 mx-auto mb-4">
-            <h1 class="text-4xl font-extrabold mb-2 drop-shadow-lg">Selamat Datang</h1>
-            <h2 class="text-2xl font-semibold">Di Situs Kantor Imigrasi Kelas I TPI<br>Tanjungpinang</h2>
+            class="admin-btn absolute top-5 right-5 px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-sky-900 rounded-full font-bold shadow-lg hover:from-yellow-500 hover:to-yellow-600 z-20 transform transition-all duration-300 hover:scale-110 ripple">
+            🔑 Admin
+        </button>
+        
+        <div class="relative glass-card p-10 rounded-3xl shadow-2xl max-w-xl mx-4 z-10 fade-in-up">
+            <img src="logouptimi.png" alt="Logo Imigrasi" class="w-36 mx-auto mb-6 pulse-animation drop-shadow-2xl">
+            <h1 class="text-5xl font-extrabold mb-3 drop-shadow-lg gradient-text">Selamat Datang</h1>
+            <h2 class="text-2xl font-semibold mb-2">Di Situs Kantor Imigrasi</h2>
+            <h2 class="text-xl font-medium mb-8">Kelas I TPI Tanjungpinang</h2>
+            
             <div class="mt-8 flex justify-center">
                 <button onclick="showPage('tamu')"
-                    class="px-6 py-3 bg-yellow-400 text-sky-900 rounded-full font-bold shadow-lg hover:bg-yellow-500 transition">Isi
-                    Buku Tamu</button>
+                    class="btn-primary px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-sky-900 rounded-full font-bold shadow-lg text-lg ripple">
+                    📝 Isi Buku Tamu
+                </button>
             </div>
-            <div class="mt-10 text-left bg-white/20 backdrop-blur-md p-5 rounded-xl shadow-md text-sm leading-relaxed">
-                <h3 class="text-lg font-bold mb-2">📍 Alamat</h3>
-                <p>Jl. Jend. A. Yani No. 31 Tanjungpinang 29124</p>
-                <h3 class="text-lg font-bold mt-4 mb-2">📞 Kontak</h3>
-                <p><strong>Nomor Whatsapp:</strong> 08117769393</p>
-                <p><strong>Situs Resmi:</strong>
+            
+            <div class="mt-10 text-left glass-card p-6 rounded-2xl shadow-lg text-sm leading-relaxed info-card">
+                <h3 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-2xl mr-2">📍</span> Alamat
+                </h3>
+                <p class="ml-8 mb-4">Jl. Jend. A. Yani No. 31 Tanjungpinang 29124</p>
+                
+                <h3 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-2xl mr-2">📞</span> Kontak
+                </h3>
+                <p class="ml-8"><strong>WhatsApp:</strong> 08117769393</p>
+                <p class="ml-8 mb-4">
+                    <strong>Website:</strong>
                     <a href="https://kanimtanjungpinang.kemenkumham.go.id/" target="_blank"
-                        class="underline hover:text-yellow-300">
+                        class="underline hover:text-yellow-300 transition-colors duration-300">
                         kanimtanjungpinang.kemenkumham.go.id
                     </a>
                 </p>
-                <h3 class="text-lg font-bold mt-4 mb-2">⏰ Jam Kerja</h3>
-                <p>Senin s.d Jumat - 08.00 s.d 16.00 WIB</p>
+                
+                <h3 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-2xl mr-2">⏰</span> Jam Kerja
+                </h3>
+                <p class="ml-8">Senin - Jumat | 08.00 - 16.00 WIB</p>
             </div>
         </div>
     </section>
 
     <!-- HALAMAN FORM TAMU -->
     <section id="tamu"
-        class="hidden min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-slideshow">
-        <div class="absolute inset-0 bg-sky-900/70"></div>
-        <div class="relative bg-white/30 backdrop-blur-md text-black shadow-lg rounded-xl p-8 w-full max-w-2xl z-10">
-           <h2 class="text-4xl font-bold mb-6 text-center text-white drop-shadow-lg">
-                 Form Buku Tamu
+        class="hidden page-section min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-slideshow py-10">
+        <div class="absolute inset-0 bg-gradient-to-br from-sky-900/80 via-blue-900/75 to-sky-900/80"></div>
+        
+        <button onclick="showPage('home')"
+            class="absolute top-5 left-5 px-6 py-3 bg-white/20 backdrop-blur-md text-white rounded-full font-bold shadow-lg hover:bg-white/30 z-20 transform transition-all duration-300 hover:scale-110 ripple">
+            ⬅ Kembali
+        </button>
+        
+        <div class="relative glass-card text-black shadow-2xl rounded-3xl p-8 w-full max-w-2xl mx-4 z-10 fade-in-up">
+           <h2 class="text-4xl font-extrabold mb-8 text-center text-white drop-shadow-lg">
+                 📋 Form Buku Tamu
            </h2>
-            <form id="guestForm" class="space-y-4">
-                <input type="text" id="nik" placeholder="NIK/IDCard (16 digit angka)" class="w-full p-3 border rounded">
-                <input type="text" id="nama" placeholder="Nama Lengkap" class="w-full p-3 border rounded" required>
-                <input type="text" id="alamat" placeholder="Alamat" class="w-full p-3 border rounded" required>
-                <input type="text" id="telepon" placeholder="Nomor Telepon (min 10 digit angka)"
-                    class="w-full p-3 border rounded" required>
-                <input type="text" id="instansi" placeholder="Instansi" class="w-full p-3 border rounded">
-                <input type="text" id="bertemu" placeholder="Bertemu Dengan" class="w-full p-3 border rounded">
-                <input type="text" id="tujuan" placeholder="Tujuan Kunjungan" class="w-full p-3 border rounded">
-                <select id="rombongan" class="w-full p-3 border rounded" required>
-                    <option disabled selected value="">Individu/Rombongan?</option>
-                    <option value="Individu">Individu</option>
-                    <option value="Rombongan">Rombongan</option>
-                </select>
-                <select id="petugas" class="w-full p-3 border rounded" required>
-                    <option disabled selected value="">Petugas</option>
-                    <option value="Wahono">Wahono</option>
-                    <option value="Rizky">Rizky</option>
-                    <option value="Fatony">Fatony</option>
-                    <option value="Teguh">Teguh</option>
-                    <option value="Sony">Sony</option>
-                    <option value="Darmawansyah">Darmawansyah</option>
-                    <option value="Putu">Putu</option>
-                    <option value="Ontong">Ontong</option>
-                    <option value="M.Kurniawan">M.Kurniawan</option>
-                    <option value="Suyatni">Suyatni</option>
-                    <option value="Badri">Badri</option>
-                    <option value="Sigit">Sigit</option>
-                    <option value="Andri">Andri</option>
-                    <option value="SriAyuni">Sri Ayuni</option>
-                    <option value="Isti">Isti</option>
-                    <option value="Junaidi">Junaidi</option>
-                    <option value="Idris">Idris</option>
-                    <option value="Dayat">Dayat</option>
-                    <option value="Firdaus">Firdaus</option>
-                </select>
-  <button type="submit"
-  class="w-full py-3 bg-yellow-400 text-sky-900 font-bold rounded hover:bg-yellow-500">
-  Kirim
-</button>
-
-</form>
-
+           
+            <form id="guestForm" class="space-y-5">
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="nik" placeholder="NIK/IDCard (16 digit angka)" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md">
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="nama" placeholder="Nama Lengkap" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="alamat" placeholder="Alamat" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="telepon" placeholder="Nomor Telepon (min 10 digit angka)"
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="instansi" placeholder="Instansi" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md">
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="bertemu" placeholder="Bertemu Dengan" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md">
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="tujuan" placeholder="Tujuan Kunjungan" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md">
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <select id="rombongan" class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
+                        <option disabled selected value="">Individu/Rombongan?</option>
+                        <option value="Individu">Individu</option>
+                        <option value="Rombongan">Rombongan</option>
+                    </select>
+                </div>
+                
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <select id="petugas" class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
+                        <option disabled selected value="">Pilih Petugas</option>
+                        <option value="Wahono">Wahono</option>
+                        <option value="Rizky">Rizky</option>
+                        <option value="Fatony">Fatony</option>
+                        <option value="Teguh">Teguh</option>
+                        <option value="Sony">Sony</option>
+                        <option value="Darmawansyah">Darmawansyah</option>
+                        <option value="Putu">Putu</option>
+                        <option value="Ontong">Ontong</option>
+                        <option value="M.Kurniawan">M.Kurniawan</option>
+                        <option value="Suyatni">Suyatni</option>
+                        <option value="Badri">Badri</option>
+                        <option value="Sigit">Sigit</option>
+                        <option value="Andri">Andri</option>
+                        <option value="SriAyuni">Sri Ayuni</option>
+                        <option value="Isti">Isti</option>
+                        <option value="Junaidi">Junaidi</option>
+                        <option value="Idris">Idris</option>
+                        <option value="Dayat">Dayat</option>
+                        <option value="Firdaus">Firdaus</option>
+                        <option value="Dannis">Dannis</option>
+                    </select>
+                </div>
+                
+                <button type="submit"
+                    class="btn-primary w-full py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-sky-900 font-bold rounded-xl hover:from-yellow-500 hover:to-yellow-600 shadow-lg text-lg ripple">
+                    ✅ Kirim Data
+                </button>
+            </form>
+        </div>
     </section>
 
     <!-- ADMIN LOGIN -->
     <section id="adminLogin"
-        class="min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-cover bg-center"
+        class="hidden page-section min-h-screen flex flex-col justify-center items-center relative text-white text-center bg-cover bg-center"
         style="background-image: url('imigrasi.jpg');">
-        <div class="absolute inset-0 bg-white/70"></div>
-        <div class="relative bg-white/30 backdrop-blur-md text-black shadow-lg rounded-xl p-8 w-full max-w-2xl z-10">
-            <img src="logouptimi.png" alt="Logo Imigrasi" class="w-24 mx-auto mb-4">
-            <h2 class="text-2xl font-bold mb-6 text-center text-sky-700">Login Admin</h2>
-            <form id="loginForm" class="space-y-4">
-                <input type="text" id="username" placeholder="Username" class="w-full p-3 border rounded" required>
-                <div class="relative">
-                    <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded"
-                        required>
-                    <span onclick="togglePassword()" class="absolute right-3 top-3 cursor-pointer">👁️</span>
+        <div class="absolute inset-0 bg-gradient-to-br from-white/80 via-white/70 to-white/80"></div>
+        
+        <button onclick="showPage('home')"
+            class="absolute top-5 left-5 px-6 py-3 bg-sky-700/20 backdrop-blur-md text-sky-900 rounded-full font-bold shadow-lg hover:bg-sky-700/30 z-20 transform transition-all duration-300 hover:scale-110 ripple">
+            ⬅ Kembali
+        </button>
+        
+        <div class="relative glass-card text-black shadow-2xl rounded-3xl p-10 w-full max-w-md mx-4 z-10 fade-in-up">
+            <img src="logouptimi.png" alt="Logo Imigrasi" class="w-28 mx-auto mb-6 pulse-animation">
+            <h2 class="text-3xl font-bold mb-8 text-center text-sky-900">🔐 Login Admin</h2>
+            
+            <form id="loginForm" class="space-y-5">
+                <div class="transform transition-all duration-300 hover:scale-105">
+                    <input type="text" id="username" placeholder="Username" 
+                        class="w-full p-4 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
                 </div>
+                
+                <div class="relative transform transition-all duration-300 hover:scale-105">
+                    <input type="password" id="password" placeholder="Password" 
+                        class="w-full p-4 pr-12 border-2 border-transparent rounded-xl bg-white/90 backdrop-blur-sm focus:bg-white shadow-md" required>
+                    <span onclick="togglePassword()" 
+                        class="absolute right-4 top-4 cursor-pointer text-2xl hover:scale-125 transition-transform duration-300">
+                        👁️
+                    </span>
+                </div>
+                
                 <button type="submit"
-                    class="w-full py-3 bg-sky-700 text-white rounded-lg font-bold hover:bg-sky-800">Login</button>
-                <p id="loginError" class="text-red-500 text-sm hidden">Username atau password salah</p>
+                    class="btn-primary w-full py-4 bg-gradient-to-r from-sky-700 to-sky-900 text-white rounded-xl font-bold hover:from-sky-800 hover:to-sky-950 shadow-lg ripple">
+                    🚀 Login
+                </button>
+                
+                <p id="loginError" class="text-red-600 text-sm font-semibold hidden bg-red-50 p-3 rounded-lg">
+                    ❌ Username atau password salah
+                </p>
             </form>
-            <button onclick="showPage('home')"
-                class="mt-4 w-full py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">⬅ Kembali ke Menu
-                Utama</button>
         </div>
     </section>
 
     <!-- ADMIN PANEL -->
-    <section id="admin" class="hidden p-6">
-        <div class="flex flex-col gap-4">
-            <h2 class="text-2xl font-bold">Daftar Tamu</h2>
-            <div class="flex flex-col md:flex-row gap-2">
-                <input type="text" id="searchInput" placeholder="Cari nama atau tanggal (YYYY-MM-DD)"
-                    class="p-2 border rounded">
-                <button onclick="logoutAdmin()"
-                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
+    <section id="admin" class="hidden page-section p-6 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col gap-6 fade-in-up">
+                <div class="bg-white rounded-2xl shadow-lg p-6 transform transition-all duration-300 hover:shadow-2xl">
+                    <h2 class="text-3xl font-extrabold text-sky-900 mb-6">📊 Dashboard Admin</h2>
+                    
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <input type="text" id="searchInput" placeholder="🔍 Cari nama atau tanggal..."
+                            class="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:border-sky-500 transition-all duration-300 hover:shadow-md">
+                        <button onclick="logoutAdmin()"
+                            class="px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 shadow-md transform transition-all duration-300 hover:scale-105 ripple">
+                            🚪 Logout
+                        </button>
+                    </div>
+
+                    <!-- Filter Tanggal -->
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <input type="date" id="startDate" 
+                            class="p-4 border-2 border-gray-200 rounded-xl focus:border-sky-500 transition-all duration-300 hover:shadow-md">
+                        <input type="date" id="endDate" 
+                            class="p-4 border-2 border-gray-200 rounded-xl focus:border-sky-500 transition-all duration-300 hover:shadow-md">
+                        <button onclick="loadGuests()" 
+                            class="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold hover:from-blue-600 hover:to-blue-700 shadow-md transform transition-all duration-300 hover:scale-105 ripple">
+                            🔄 Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STATISTIK PENGUNJUNG -->
+                <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="stat-card bg-gradient-to-br from-sky-500 to-sky-600 text-white p-8 rounded-2xl shadow-lg text-center cursor-pointer">
+                        <h3 class="text-xl font-bold mb-3">👥 Total Pengunjung</h3>
+                        <p id="statTotal" class="text-5xl font-extrabold mt-2">0</p>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-2xl shadow-lg text-center cursor-pointer">
+                        <h3 class="text-xl font-bold mb-3">👤 Individu</h3>
+                        <p id="statIndividu" class="text-5xl font-extrabold mt-2">0</p>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-8 rounded-2xl shadow-lg text-center cursor-pointer">
+                        <h3 class="text-xl font-bold mb-3">👥 Rombongan</h3>
+                        <p id="statRombongan" class="text-5xl font-extrabold mt-2">0</p>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gradient-to-r from-sky-600 to-sky-700 text-white">
+                                <tr>
+                                    <th class="p-4 font-bold">⏰ Waktu</th>
+                                    <th class="p-4 font-bold">🆔 NIK/IDCard</th>
+                                    <th class="p-4 font-bold">👤 Nama</th>
+                                    <th class="p-4 font-bold">📍 Alamat</th>
+                                    <th class="p-4 font-bold">📞 Telepon</th>
+                                    <th class="p-4 font-bold">🏢 Instansi</th>
+                                    <th class="p-4 font-bold">🤝 Bertemu</th>
+                                    <th class="p-4 font-bold">🎯 Tujuan</th>
+                                    <th class="p-4 font-bold">👥 Rombongan</th>
+                                    <th class="p-4 font-bold">👨‍💼 Petugas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="guestList" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center gap-4 items-center bg-white rounded-2xl shadow-lg p-6" id="paginationControls">
+                    <button id="prevPage" 
+                        class="px-6 py-3 bg-gradient-to-r from-gray-300 to-gray-400 rounded-xl font-bold hover:from-gray-400 hover:to-gray-500 transform transition-all duration-300 hover:scale-105 shadow-md ripple">
+                        ⬅ Prev
+                    </button>
+                    <span id="pageInfo" class="font-bold text-lg text-sky-900 px-4"></span>
+                    <button id="nextPage" 
+                        class="px-6 py-3 bg-gradient-to-r from-gray-300 to-gray-400 rounded-xl font-bold hover:from-gray-400 hover:to-gray-500 transform transition-all duration-300 hover:scale-105 shadow-md ripple">
+                        Next ➡
+                    </button>
+                </div>
+
+                <!-- Tombol kembali -->
+                <button onclick="showPage('home')"
+                    class="w-full py-4 bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 rounded-xl font-bold hover:from-gray-400 hover:to-gray-500 shadow-md transform transition-all duration-300 hover:scale-105 ripple">
+                    ⬅ Kembali ke Menu Utama
+                </button>
             </div>
-
-    <!-- Filter Tanggal -->
-<div class="flex flex-wrap gap-4 mt-4 mb-6">
-  <input type="date" id="startDate" class="p-2 border rounded">
-  <input type="date" id="endDate" class="p-2 border rounded">
-  <button onclick="loadGuests()" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-    Filter
-  </button>
-</div>
-
-            <!-- STATISTIK PENGUNJUNG -->
-<div id="statsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-8">
-    <div class="bg-sky-600 text-white p-4 rounded shadow text-center">
-        <h3 class="text-lg font-bold">Total Pengunjung</h3>
-        <p id="statTotal" class="text-2xl font-extrabold mt-2">0</p>
-    </div>
-    <div class="bg-green-600 text-white p-4 rounded shadow text-center">
-        <h3 class="text-lg font-bold">Individu</h3>
-        <p id="statIndividu" class="text-2xl font-extrabold mt-2">0</p>
-    </div>
-    <div class="bg-yellow-600 text-white p-4 rounded shadow text-center">
-        <h3 class="text-lg font-bold">Rombongan</h3>
-        <p id="statRombongan" class="text-2xl font-extrabold mt-2">0</p>
-    </div>
-</div>
-
-            <div class="overflow-x-auto mt-6">
-                <table class="w-full bg-white shadow rounded text-sm">
-                    <thead class="bg-sky-600 text-white">
-                        <tr>
-                            <th class="p-2">Waktu</th>
-                            <th class="p-2">NIK/IDCard</th>
-                            <th class="p-2">Nama</th>
-                            <th class="p-2">Alamat</th>
-                            <th class="p-2">Telepon</th>
-                            <th class="p-2">Instansi</th>
-                            <th class="p-2">Bertemu</th>
-                            <th class="p-2">Tujuan</th>
-                            <th class="p-2">Rombongan</th>
-                            <th class="p-2">Petugas</th>
-                        </tr>
-                    </thead>
-                    <tbody id="guestList"></tbody>
-                </table>
-            </div>
-            <!-- Tombol kembali -->
-<button onclick="showPage('home')"
-class="mt-4 py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
-⬅ Kembali ke Menu Utama
-</button>
-
-<!-- PAGINATION CONTROL -->
-<div class="flex justify-center gap-4 mt-6 items-center" id="paginationControls">
-  <button id="prevPage" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">⬅ Prev</button>
-  <span id="pageInfo" class="font-semibold"></span>
-  <button id="nextPage" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Next ➡</button>
-</div>
-
         </div>
     </section>
-    </div>
-    <script>
 
+    <script>
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbx4gCtVDESvzbGzDdGrypByXfdUG9915snIdsyEyWpr6KoCdjKr-3gueTlfVGLsOMwi/exec";
 
-       const pages = ["home", "tamu", "adminLogin", "admin"];
+const pages = ["home", "tamu", "adminLogin", "admin"];
 
 function showPage(page) {
-  pages.forEach(p => document.getElementById(p).classList.add("hidden"));
-  document.getElementById(page).classList.remove("hidden");
-  if (page === "admin") {
-    checkAdminAccess(); // ✅ supaya admin tidak bisa dibuka tanpa login
-  }
+    pages.forEach(p => {
+        const el = document.getElementById(p);
+        if (el) el.classList.add("hidden");
+    });
+    const targetPage = document.getElementById(page);
+    if (targetPage) {
+        targetPage.classList.remove("hidden");
+        // Add fade in animation
+        targetPage.style.animation = 'none';
+        setTimeout(() => {
+            targetPage.style.animation = 'fadeIn 0.5s ease-out';
+        }, 10);
+    }
+    if (page === "admin") {
+        checkAdminAccess();
+    }
 }
 
 document.getElementById("guestForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  const nik = document.getElementById("nik").value.trim();
-  const telepon = document.getElementById("telepon").value.trim();
+    const nik = document.getElementById("nik").value.trim();
+    const telepon = document.getElementById("telepon").value.trim();
 
-  if (!/^\d{10,}$/.test(telepon)) {
-    alert("Nomor telepon minimal 10 digit angka!");
-    return;
-  }
-  const data = {
-  waktu: new Date().toISOString(),   // ✅ WAJIB DITAMBAH
-  nik,
-  nama: document.getElementById("nama").value,
-  alamat: document.getElementById("alamat").value,
-  telepon,
-  instansi: document.getElementById("instansi").value,
-  bertemu: document.getElementById("bertemu").value,
-  tujuan: document.getElementById("tujuan").value,
-  rombongan: document.getElementById("rombongan").value,
-  petugas: document.getElementById("petugas").value,
-};
+    if (!/^\d{10,}$/.test(telepon)) {
+        alert("❌ Nomor telepon minimal 10 digit angka!");
+        return;
+    }
 
-try {
-  const formData = new FormData();
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<div class="spinner mx-auto"></div>';
+    submitBtn.disabled = true;
 
-  for (const key in data) {
-    formData.append(key, data[key]);
-  }
+    const data = {
+        waktu: new Date().toISOString(),
+        nik,
+        nama: document.getElementById("nama").value,
+        alamat: document.getElementById("alamat").value,
+        telepon,
+        instansi: document.getElementById("instansi").value,
+        bertemu: document.getElementById("bertemu").value,
+        tujuan: document.getElementById("tujuan").value,
+        rombongan: document.getElementById("rombongan").value,
+        petugas: document.getElementById("petugas").value,
+    };
 
-  const res = await fetch(SHEET_API_URL, {
-    method: "POST",
-    body: formData
-  });
+    try {
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
 
-  const text = await res.text();
-  const result = JSON.parse(text);
+        const res = await fetch(SHEET_API_URL, {
+            method: "POST",
+            body: formData
+        });
 
-  if (result.status === "success") {
-    alert("✅ Data tamu berhasil disimpan!");
-    this.reset(); 
-    showPage("home");
-  } else {
-    alert("❌ " + result.message);
-  }
+        const text = await res.text();
+        const result = JSON.parse(text);
 
-} catch (err) {
-  console.error(err);
-  alert("❌ Gagal menyimpan ke Spreadsheet!");
-}
+        if (result.status === "success") {
+            alert("✅ Data tamu berhasil disimpan!");
+            this.reset();
+            showPage("home");
+        } else {
+            alert("❌ " + result.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("❌ Gagal menyimpan ke Spreadsheet!");
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
 });
 
-        function checkAdminAccess() { if (localStorage.getItem("isAdminLoggedIn") !== "true") showPage("adminLogin"); else loadGuests(); }
-        document.getElementById("loginForm").addEventListener("submit", e => { e.preventDefault(); if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "admin123") { localStorage.setItem("isAdminLoggedIn", "true"); showPage("admin"); loadGuests(); } else document.getElementById("loginError").classList.remove("hidden"); });
-        function logoutAdmin() { localStorage.removeItem("isAdminLoggedIn"); alert("Logout berhasil!"); showPage("adminLogin"); }
-        function togglePassword() { const f = document.getElementById("password"); f.type = f.type === "password" ? "text" : "password"; }
+function checkAdminAccess() { 
+    if (localStorage.getItem("isAdminLoggedIn") !== "true") {
+        showPage("adminLogin");
+    } else {
+        loadGuests();
+    }
+}
 
+document.getElementById("loginForm").addEventListener("submit", e => { 
+    e.preventDefault();
+    const loginBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = loginBtn.innerHTML;
+    
+    if (document.getElementById("username").value === "admin" && document.getElementById("password").value === "admin123") { 
+        loginBtn.innerHTML = '<div class="spinner mx-auto"></div>';
+        setTimeout(() => {
+            localStorage.setItem("isAdminLoggedIn", "true"); 
+            showPage("admin"); 
+            loadGuests();
+            loginBtn.innerHTML = originalText;
+        }, 500);
+    } else {
+        document.getElementById("loginError").classList.remove("hidden");
+        setTimeout(() => {
+            document.getElementById("loginError").classList.add("hidden");
+        }, 3000);
+    }
+});
+
+function logoutAdmin() { 
+    localStorage.removeItem("isAdminLoggedIn"); 
+    alert("✅ Logout berhasil!"); 
+    showPage("adminLogin"); 
+}
+
+function togglePassword() { 
+    const f = document.getElementById("password"); 
+    f.type = f.type === "password" ? "text" : "password"; 
+}
 
 // === SLIDESHOW HOME ===
 const homeImages = [
-  "imigrasi.jpg",
-  "Ruang Pelayanan.jpg",
-  "MPP1.jpg",
-  "Apel1.jpg",
+    "imigrasi.jpg",
+    "Ruang Pelayanan.jpg",
+    "MPP1.jpg",
+    "Apel1.jpg",
 ];
 let homeIndex = 0;
 const homeSection = document.getElementById("home");
 
 function changeHomeBackground() {
-  homeSection.style.backgroundImage = `url('${homeImages[homeIndex]}')`;
-  homeIndex = (homeIndex + 1) % homeImages.length;
+    homeSection.style.backgroundImage = `url('${homeImages[homeIndex]}')`;
+    homeIndex = (homeIndex + 1) % homeImages.length;
 }
 changeHomeBackground();
 setInterval(changeHomeBackground, 5000);
 
 // === SLIDESHOW FORM TAMU ===
 const tamuImages = [
-  "Apel2.jpg",
-  "Ruang Pelayanan1.jpg",
-  "TPI1.jpg"
+    "Apel2.jpg",
+    "Ruang Pelayanan1.jpg",
+    "TPI1.jpg"
 ];
 let tamuIndex = 0;
 const tamuSection = document.getElementById("tamu");
 
 function changeTamuBackground() {
-  tamuSection.style.backgroundImage = `url('${tamuImages[tamuIndex]}')`;
-  tamuIndex = (tamuIndex + 1) % tamuImages.length;
+    tamuSection.style.backgroundImage = `url('${tamuImages[tamuIndex]}')`;
+    tamuIndex = (tamuIndex + 1) % tamuImages.length;
 }
 changeTamuBackground();
 setInterval(changeTamuBackground, 5000);
+
 // === PAGINATION ===
 let currentPage = 1;
 const itemsPerPage = 10;
 
-function parseTanggalIndonesia(input) {
-  if (!input) return "";
-
-  if (input instanceof Date && !isNaN(input)) {
-    return input.toISOString().slice(0, 10);
-  }
-
-  if (typeof input === "number") {
-    const utc_days = Math.floor(input - 25569);
-    const utc_value = utc_days * 86400;
-    const d = new Date(utc_value * 1000);
-    return d.toISOString().slice(0, 10);
-  }
-
-  const s = String(input).trim();
-
-  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
-  if (m) {
-    const d = m[1].padStart(2,"0");
-    const mo = m[2].padStart(2,"0");
-    let y = m[3];
-    if (y.length === 2) y = "20" + y;
-    return `${y}-${mo}-${d}`;
-  }
-
-  const d2 = new Date(s);
-  if (!isNaN(d2)) return d2.toISOString().slice(0, 10);
-
-  return "";
-}
-
 async function loadGuests() {
-  try {
-    const res = await fetch(SHEET_API_URL);
-    const result = await res.json();
+    try {
+        const res = await fetch(SHEET_API_URL);
+        const result = await res.json();
 
-    console.log("API response:", result);
+        console.log("API response:", result);
 
-    // Ambil array data tanpa bergantung pada bentuk response
-    const rawData = Array.isArray(result) ? result : (result && Array.isArray(result.data) ? result.data : []);
+        const rawData = Array.isArray(result) ? result : (result && Array.isArray(result.data) ? result.data : []);
 
-    if (!Array.isArray(rawData)) {
-      console.warn("Warning: rawData bukan array, set ke []");
+        if (!Array.isArray(rawData)) {
+            console.warn("Warning: rawData bukan array, set ke []");
+        }
+
+        const guests = rawData.map(r => {
+            return {
+                waktu: r.Timestamp || r.waktu || r.Waktu || r["Timestamp"] || "",
+                nik: r.NIK || r.nik || r["NIK/IDCard"] || r["NIK"] || "",
+                nama: r.Nama || r.nama || r["Nama Lengkap"] || "",
+                alamat: r.Alamat || r.alamat || "",
+                telepon: r["No. Telp"] || r.Telepon || r.telepon || "",
+                instansi: r.Instansi || r.instansi || "",
+                bertemu: r["Bertemu Dengan"] || r.Bertemu || r.bertemu || "",
+                tujuan: r["Tujuan Kunjungan"] || r.Tujuan || r.tujuan || "",
+                rombongan: r["Individu/Rombongan"] || r.Rombongan || r.rombongan || "",
+                petugas: r.Petugas || r.petugas || "",
+            };
+        });
+
+        const search = (document.getElementById("searchInput")?.value || "").toLowerCase();
+        const startDate = document.getElementById("startDate")?.value || "";
+        const endDate = document.getElementById("endDate")?.value || "";
+        const list = document.getElementById("guestList");
+
+        const filtered = guests.filter(e => {
+            if (!e.waktu) return false;
+
+            let tanggal = "";
+            try {
+                tanggal = new Date(e.waktu).toISOString().slice(0, 10);
+            } catch (err) {
+                tanggal = "";
+            }
+
+            const namaLower = (e.nama || "").toLowerCase();
+            const cocokSearch = namaLower.includes(search) || tanggal.includes(search);
+
+            let cocokTanggal = true;
+            if (startDate && tanggal && tanggal < startDate) cocokTanggal = false;
+            if (endDate && tanggal && tanggal > endDate) cocokTanggal = false;
+
+            return cocokSearch && cocokTanggal;
+        });
+
+        const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const start = (currentPage - 1) * itemsPerPage;
+        const paginatedData = filtered.slice(start, start + itemsPerPage);
+
+        list.innerHTML = paginatedData.map((e, index) => `
+            <tr class="border-b hover:bg-gradient-to-r from-sky-50 to-blue-50 transition-all duration-300" style="animation: fadeInUp 0.3s ease-out ${index * 0.05}s both;">
+                <td class="p-4">${e.waktu ? new Date(e.waktu).toLocaleString('id-ID') : "-"}</td>
+                <td class="p-4 font-semibold">${e.nik || "-"}</td>
+                <td class="p-4 font-bold text-sky-700">${e.nama || "-"}</td>
+                <td class="p-4">${e.alamat || "-"}</td>
+                <td class="p-4">${e.telepon || "-"}</td>
+                <td class="p-4">${e.instansi || "-"}</td>
+                <td class="p-4">${e.bertemu || "-"}</td>
+                <td class="p-4">${e.tujuan || "-"}</td>
+                <td class="p-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold ${e.rombongan === 'Individu' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                        ${e.rombongan || "-"}
+                    </span>
+                </td>
+                <td class="p-4 font-semibold text-blue-600">${e.petugas || "-"}</td>
+            </tr>
+        `).join("");
+
+        document.getElementById("pageInfo").textContent =
+            filtered.length === 0 ? "📭 Tidak ada data" : `📄 Halaman ${currentPage} dari ${totalPages}`;
+
+        updateStatsOnline(filtered);
+
+    } catch (err) {
+        console.error("loadGuests error:", err);
+        alert("❌ Gagal mengambil data dari Spreadsheet!");
     }
-
-    // Mapping yang toleran terhadap nama kolom berbeda
-    const guests = rawData.map(r => {
-      // r bisa berupa object hasil parse header->value (Apps Script doGet)
-      return {
-        // beberapa kemungkinan nama kolom
-        waktu: r.Timestamp || r.waktu || r.Waktu || r["Timestamp"] || "",
-        nik: r.NIK || r.nik || r["NIK/IDCard"] || r["NIK"] || "",
-        nama: r.Nama || r.nama || r["Nama Lengkap"] || "",
-        alamat: r.Alamat || r.alamat || "",
-        telepon: r["No. Telp"] || r.Telepon || r.telepon || "",
-        instansi: r.Instansi || r.instansi || "",
-        bertemu: r["Bertemu Dengan"] || r.Bertemu || r.bertemu || "",
-        tujuan: r["Tujuan Kunjungan"] || r.Tujuan || r.tujuan || "",
-        rombongan: r["Individu/Rombongan"] || r.Rombongan || r.rombongan || "",
-        petugas: r.Petugas || r.petugas || "",
-      };
-    });
-
-    // ambil filter/input
-    const search = (document.getElementById("searchInput")?.value || "").toLowerCase();
-    const startDate = document.getElementById("startDate")?.value || "";
-    const endDate = document.getElementById("endDate")?.value || "";
-    const list = document.getElementById("guestList");
-
-    // filter dan normalisasi tanggal
-    const filtered = guests.filter(e => {
-      if (!e.waktu) return false;
-
-      // coba parse e.waktu ke ISO date (toleran)
-      let tanggal = "";
-      try {
-        tanggal = new Date(e.waktu).toISOString().slice(0, 10);
-      } catch (err) {
-        tanggal = "";
-      }
-
-      const namaLower = (e.nama || "").toLowerCase();
-      const cocokSearch = namaLower.includes(search) || tanggal.includes(search);
-
-      let cocokTanggal = true;
-      if (startDate && tanggal && tanggal < startDate) cocokTanggal = false;
-      if (endDate && tanggal && tanggal > endDate) cocokTanggal = false;
-
-      return cocokSearch && cocokTanggal;
-    });
-
-    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    const start = (currentPage - 1) * itemsPerPage;
-    const paginatedData = filtered.slice(start, start + itemsPerPage);
-
-    list.innerHTML = paginatedData.map(e => `
-      <tr class="border-b hover:bg-gray-50 h-14">
-        <td class="p-2">${e.waktu ? new Date(e.waktu).toLocaleString() : "-"}</td>
-        <td class="p-2">${e.nik || "-"}</td>
-        <td class="p-2">${e.nama || "-"}</td>
-        <td class="p-2">${e.alamat || "-"}</td>
-        <td class="p-2">${e.telepon || "-"}</td>
-        <td class="p-2">${e.instansi || "-"}</td>
-        <td class="p-2">${e.bertemu || "-"}</td>
-        <td class="p-2">${e.tujuan || "-"}</td>
-        <td class="p-2">${e.rombongan || "-"}</td>
-        <td class="p-2">${e.petugas || "-"}</td>
-      </tr>
-    `).join("");
-
-    document.getElementById("pageInfo").textContent =
-      filtered.length === 0 ? "Tidak ada data" : `Halaman ${currentPage} dari ${totalPages}`;
-
-    updateStatsOnline(filtered);
-
-  } catch (err) {
-    console.error("loadGuests error:", err);
-    alert("❌ Gagal mengambil data dari Spreadsheet!");
-  }
 }
 
 document.getElementById("nextPage").addEventListener("click", async () => {
-  try {
-    const res = await fetch(SHEET_API_URL);
-    const result = await res.json();
-    const rawData = Array.isArray(result) ? result : (result && Array.isArray(result.data) ? result.data : []);
-    const totalPages = Math.ceil(rawData.length / itemsPerPage) || 1;
+    try {
+        const res = await fetch(SHEET_API_URL);
+        const result = await res.json();
+        const rawData = Array.isArray(result) ? result : (result && Array.isArray(result.data) ? result.data : []);
+        const totalPages = Math.ceil(rawData.length / itemsPerPage) || 1;
 
-    if (currentPage < totalPages) {
-      currentPage++;
-      loadGuests();
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadGuests();
+        }
+    } catch (e) {
+        console.error("NextPage error:", e);
     }
-  } catch (e) {
-    console.error("NextPage error:", e);
-  }
+});
+
+document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadGuests();
+    }
 });
 
 // Refresh otomatis saat search atau filter berubah
@@ -456,34 +835,43 @@ document.getElementById("searchInput").addEventListener("input", () => {
     currentPage = 1;
     loadGuests();
 });
+
 document.getElementById("startDate").addEventListener("change", () => {
     currentPage = 1;
     loadGuests();
 });
+
 document.getElementById("endDate").addEventListener("change", () => {
     currentPage = 1;
     loadGuests();
 });
 
 function updateStatsOnline(data) {
-  const total = data.length;
-  const individu = data.filter(g => g.rombongan === "Individu").length;
-  const rombongan = data.filter(g => g.rombongan === "Rombongan").length;
+    const total = data.length;
+    const individu = data.filter(g => g.rombongan === "Individu").length;
+    const rombongan = data.filter(g => g.rombongan === "Rombongan").length;
 
-  document.getElementById("statTotal").textContent = total;
-  document.getElementById("statIndividu").textContent = individu;
-  document.getElementById("statRombongan").textContent = rombongan;
+    // Animasi counter
+    animateValue("statTotal", 0, total, 1000);
+    animateValue("statIndividu", 0, individu, 1000);
+    animateValue("statRombongan", 0, rombongan, 1000);
 }
 
-document.getElementById("prevPage").addEventListener("click", () => {
-  if (currentPage > 1) {
-    currentPage--;
-    loadGuests();
-  }
-});
+function animateValue(id, start, end, duration) {
+    const obj = document.getElementById(id);
+    const range = end - start;
+    const increment = end > start ? 1 : -1;
+    const stepTime = Math.abs(Math.floor(duration / range));
+    let current = start;
 
+    const timer = setInterval(() => {
+        current += increment;
+        obj.textContent = current;
+        if (current === end) {
+            clearInterval(timer);
+        }
+    }, stepTime);
+}
     </script>
 </body>
-
 </html>
-
